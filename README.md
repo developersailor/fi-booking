@@ -8,8 +8,8 @@
 # npm i
 # npm start
 
-[http://localhost:5173/](host)
+[host](http://localhost:5173/)
 
-[1.png]()
-[2.png]()
-[3.png]()
+[ekran görüntüsü 1](1.png)
+[ekran görüntüsü 2](2.png)
+[ekran görüntüsü 3](3.png)
