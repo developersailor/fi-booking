@@ -1,18 +1,52 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+import { logout } from '../slice/authSlice';
 
 const Header: React.FC = () => {
+  const { user } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
+
   return (
-    <header className="flex justify-between items-center p-6 bg-gray-100">
-      <div className="text-xl font-bold">Logo</div>
-      <nav className="space-x-4 hidden md:block">
-        <Link to="/" className="text-gray-600">Home</Link>
-        <Link to="/about" className="text-gray-600">About</Link>
-        <Link to="/contact" className="text-gray-600">Contact</Link>
-        <Link to="/check-availability" className="text-gray-600">Check Availability</Link>
-      </nav>
-      <button className="px-4 py-2 bg-black text-white rounded hidden md:block">Sign In</button>
-      <div className="md:hidden">☰</div> {/* A simple icon for mobile menu */}
+    <header className="bg-white shadow">
+      <div className="max-w-4xl mx-auto p-4 flex justify-between items-center">
+        <Link to="/" className="text-xl font-bold">
+          Home
+        </Link>
+        <nav>
+          <Link to="/about" className="mr-4">
+            About
+          </Link>
+          <Link to="/contact" className="mr-4">
+            Contact
+          </Link>
+          <Link to="/check-availability" className="mr-4">
+            Check Availability
+          </Link>
+          {user ? (
+            <>
+              <span className="mr-4">{user.username}</span>
+              <button onClick={handleLogout} className="bg-red-500 text-white px-3 py-2 rounded">
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="mr-4">
+                Login
+              </Link>
+              <Link to="/register">
+                Register
+              </Link>
+            </>
+          )}
+        </nav>
+      </div>
     </header>
   );
 };

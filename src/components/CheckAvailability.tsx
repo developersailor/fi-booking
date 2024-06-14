@@ -1,29 +1,24 @@
-import React, { useState } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { useDispatch, useSelector } from "react-redux";
-import { checkAvailability } from "../slice/availabilitySlice";
-import { RootState, AppDispatch } from "../store/store";
-import { Draft, SerializedError } from "@reduxjs/toolkit"; // Import the WritableDraft type
+import React, { useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { checkAvailability } from '../slice/availabilitySlice';
+import { RootState, AppDispatch } from '../store/store';
 
 const CheckAvailability: React.FC = () => {
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
   const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
-  const dispatch = useDispatch<AppDispatch>(); // Use the AppDispatch type here
-  const { available, loading, error } = useSelector(
-    (state: RootState) => state.availability
-  );
+  const dispatch = useDispatch<AppDispatch>();
+  const { available, loading, error } = useSelector((state: RootState) => state.availability);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (checkInDate && checkOutDate) {
-      dispatch(
-        checkAvailability({
-          checkInDate: checkInDate.toISOString(),
-          checkOutDate: checkOutDate.toISOString(),
-        })
-      );
+      dispatch(checkAvailability({
+        checkInDate: checkInDate.toISOString(),
+        checkOutDate: checkOutDate.toISOString(),
+      }));
     }
   };
 
@@ -51,23 +46,13 @@ const CheckAvailability: React.FC = () => {
           Check Availability
         </button>
       </form>
-      {loading && (
-        <div className="mt-4 text-xl font-bold">Checking availability...</div>
-      )}
+      {loading && <div className="mt-4 text-xl font-bold">Checking availability...</div>}
       {available !== null && !loading && (
         <div className="mt-4 text-xl font-bold">
-          Availability: {available ? "Available" : "Not Available"}
+          Availability: {available ? 'Available' : 'Not Available'}
         </div>
       )}
-      {error && (
-        <div>
-          Error:{" "}
-          {(error as Draft<SerializedError>).code === "400"
-            ? "Bad Request: Something went wrong with your request."
-            : Number((error as Draft<SerializedError>).code) ||
-              "An error occurred"}
-        </div>
-      )}
+      {typeof error === 'string' && <div className="mt-4 text-red-600">{error}</div>}
     </div>
   );
 };

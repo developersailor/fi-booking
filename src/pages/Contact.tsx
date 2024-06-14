@@ -4,13 +4,29 @@ const Contact: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [status, setStatus] = useState('');
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // Handle form submission logic here
-    console.log('Name:', name);
-    console.log('Email:', email);
-    console.log('Message:', message);
+
+    const response = await fetch('http://localhost:3000/contact', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, email, message }),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      setStatus('Message sent successfully!');
+      setName('');
+      setEmail('');
+      setMessage('');
+    } else {
+      setStatus(result.error || 'Something went wrong. Please try again.');
+    }
   };
 
   return (
@@ -51,6 +67,7 @@ const Contact: React.FC = () => {
           Send Message
         </button>
       </form>
+      {status && <p className="mt-4 text-red-500">{status}</p>}
     </div>
   );
 };

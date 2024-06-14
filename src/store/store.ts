@@ -1,9 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 import availabilityReducer from '../slice/availabilitySlice';
-
+import authReducer from '../slice/authSlice';
 const store = configureStore({
   reducer: {
     availability: availabilityReducer,
+    auth: authReducer,
   },
 });
 
