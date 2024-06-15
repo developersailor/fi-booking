@@ -41,24 +41,11 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Routes and business logic
-app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  const hashedPassword = bcrypt.hashSync(password, 8);
-
-  try {
-    await client.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hashedPassword]);
-    res.status(201).send({ message: 'User registered successfully!' });
-  } catch (error) {
-    res.status(500).send({ error: 'Database error: ' + error.message });
-  }
-});
-
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const result = await client.query('SELECT * FROM users WHERE username = $1', [username]);
+    const result = await client.query('SELECT * FROM Users WHERE username = $1', [username]);
     const user = result.rows[0];
 
     if (!user) {
@@ -162,30 +149,6 @@ app.get('/test-email', async (req, res) => {
       return res.status(500).json({ error: 'Failed to send email', details: error.toString() });
     } else {
       return res.status(200).json({ success: 'Test email sent successfully!' });
-    }
-  });
-});
-
-app.post('/contact', (req, res) => {
-  const { name, email, message } = req.body;
-
-  if (!name || !email || !message) {
-    return res.status(400).json({ error: 'All fields are required' });
-  }
-
-  const mailOptions = {
-    from: email,
-    to: process.env.EMAIL_USER,
-    subject: 'Contact Form Submission',
-    text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
-  };
-
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error('Error sending email:', error);
-      return res.status(500).json({ error: 'Failed to send email', details: error.toString() });
-    } else {
-      return res.status(200).json({ success: 'Message sent successfully!' });
     }
   });
 });
