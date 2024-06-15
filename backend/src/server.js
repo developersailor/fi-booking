@@ -42,27 +42,25 @@ const mailjet = nodemailer.createTransport(nodemailerMailjet(auth));
 
 // Mail gönderme rotanızı oluşturun
 app.post('/contact', (req, res) => {
+  const { name, email, message } = req.body;
   // Gönderilecek mailin bilgilerini girin
   const mailOptions = {
-    from: 'Gönderen Adı <kullanıcıadresi@mail.com>',
-    to: 'Alıcı Adı <alıcıadresi@mail.com>',
-    subject: 'Konu',
-    text: 'Mail içeriği'
+    from: email,
+    to: process.env.EMAIL_USER,
+    subject: 'Contact Form Submission',
+    text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
   };
 
   // Maili gönderin
-  mailjet
-    .post('send', {
-      messages: [mailOptions]
-    })
-    .then(() => {
-      res.json({ message: 'Mail gönderildi!' });
-    })
-    .catch(error => {
+  mailjet.sendMail(mailOptions, (error, info) => {
+    if (error) {
       console.error(error);
-      res.status(500).json({ error: 'Mail gönderme sırasında bir hata oluştu!' });
-    });
+      return res.status(500).json({ error: 'Mail gönderme sırasında bir hata oluştu!' });
+    }
+    res.json({ message: 'Mail gönderildi!' });
+  });
 });
+
 
 // Sequelize setup
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
