@@ -4,28 +4,28 @@ const Contact: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
-  const [status, setStatus] = useState('');
+  const [response, setResponse] = useState('');
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    const response = await fetch('http://localhost:3000/contact', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name, email, message }),
-    });
+    try {
+      const res = await fetch('http://localhost:3000/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, message }),
+      });
 
-    const result = await response.json();
-
-    if (response.ok) {
-      setStatus('Message sent successfully!');
-      setName('');
-      setEmail('');
-      setMessage('');
-    } else {
-      setStatus(result.error || 'Something went wrong. Please try again.');
+      const data = await res.json();
+      if (data.success) {
+        setResponse('Message sent successfully!');
+      } else {
+        setResponse('Failed to send message.');
+      }
+    } catch (error) {
+      setResponse('An error occurred.');
     }
   };
 
@@ -67,7 +67,7 @@ const Contact: React.FC = () => {
           Send Message
         </button>
       </form>
-      {status && <p className="mt-4 text-red-500">{status}</p>}
+      {response && <p>{response}</p>}
     </div>
   );
 };

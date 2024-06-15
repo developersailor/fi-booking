@@ -5,6 +5,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const nodemailer = require('nodemailer');
+const { Client } = require('pg');
+const { Sequelize, DataTypes } = require('sequelize');
 
 dotenv.config(); // Load environment variables from .env file
 
@@ -22,56 +24,217 @@ const corsOptions = {
 app.use(bodyParser.json());
 app.use(cors(corsOptions));
 
-// In-memory storage for bookings (for simplicity)
-const bookings = [];
-let users = [];
+// Database setup
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+});
 
-// Nodemailer setup
+client.connect();
+
+// Nodemailer setup with Mailjet
 const transporter = nodemailer.createTransport({
-  service: 'Gmail',
+  host: 'in-v3.mailjet.com',
+  port: 587,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.MAILJET_API_KEY_PUBLIC,
+    pass: process.env.MAILJET_API_KEY_PRIVATE,
   },
 });
 
-app.post('/register', (req, res) => {
+// Routes and business logic
+app.post('/register', async (req, res) => {
   const { username, password } = req.body;
   const hashedPassword = bcrypt.hashSync(password, 8);
 
-  users.push({ username, password: hashedPassword });
-
-  res.status(201).send({ message: 'User registered successfully!' });
+  try {
+    await client.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hashedPassword]);
+    res.status(201).send({ message: 'User registered successfully!' });
+  } catch (error) {
+    res.status(500).send({ error: 'Database error: ' + error.message });
+  }
 });
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  const user = users.find(user => user.username === username);
 
-  if (!user) {
-    return res.status(404).send({ message: 'User not found!' });
+  try {
+    const result = await client.query('SELECT * FROM users WHERE username = $1', [username]);
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.status(404).send({ message: 'User not found!' });
+    }
+
+    const isPasswordValid = bcrypt.compareSync(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).send({ message: 'Invalid password!' });
+    }
+
+    const token = jwt.sign({ id: user.username }, SECRET_KEY, {
+      expiresIn: 86400, // 24 hours
+    });
+
+    res.status(200).send({
+      user: {
+        username: user.username,
+      },
+      token,
+    });
+  } catch (error) {
+    res.status(500).send({ error: 'Database error: ' + error.message });
+  }
+});
+
+app.post('/contact', (req, res) => {
+  const { name, email, message } = req.body;
+
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: 'All fields are required' });
   }
 
-  const isPasswordValid = bcrypt.compareSync(password, user.password);
+  const mailOptions = {
+    from: email,
+    to: process.env.EMAIL_USER,
+    subject: 'Contact Form Submission',
+    text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
+  };
 
-  if (!isPasswordValid) {
-    return res.status(401).send({ message: 'Invalid password!' });
-  }
-
-  const token = jwt.sign({ id: user.username }, SECRET_KEY, {
-    expiresIn: 86400, // 24 hours
-  });
-
-  res.status(200).send({
-    user: {
-      username: user.username,
-    },
-    token,
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error);
+      return res.status(500).json({ error: 'Failed to send email', details: error.toString() });
+    } else {
+      return res.status(200).json({ success: 'Message sent successfully!' });
+    }
   });
 });
 
-// Check availability endpoint
-app.post('/check-availability', (req, res) => {
+
+
+
+
+
+app.use(bodyParser.json());
+app.use(cors(corsOptions));
+
+// Sequelize setup
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: 'postgres',
+});
+
+const User = sequelize.define('User', {
+  username: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+});
+
+const Booking = sequelize.define('Booking', {
+  username: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  checkInDate: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+  checkOutDate: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+});
+
+app.get('/test-email', async (req, res) => {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: process.env.EMAIL_USER,
+    subject: 'Test Email',
+    text: 'This is a test email.',
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return res.status(500).json({ error: 'Failed to send email', details: error.toString() });
+    } else {
+      return res.status(200).json({ success: 'Test email sent successfully!' });
+    }
+  });
+});
+
+app.post('/contact', (req, res) => {
+  const { name, email, message } = req.body;
+
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  const mailOptions = {
+    from: email,
+    to: process.env.EMAIL_USER,
+    subject: 'Contact Form Submission',
+    text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error);
+      return res.status(500).json({ error: 'Failed to send email', details: error.toString() });
+    } else {
+      return res.status(200).json({ success: 'Message sent successfully!' });
+    }
+  });
+});
+
+
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  const hashedPassword = bcrypt.hashSync(password, 8);
+
+  try {
+    await User.create({ username, password: hashedPassword });
+    res.status(201).send({ message: 'User registered successfully!' });
+  } catch (error) {
+    res.status(500).send({ error: 'Registration failed!' });
+  }
+});
+
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const user = await User.findOne({ where: { username } });
+
+    if (!user) {
+      return res.status(404).send({ message: 'User not found!' });
+    }
+
+    const isPasswordValid = bcrypt.compareSync(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).send({ message: 'Invalid password!' });
+    }
+
+    const token = jwt.sign({ id: user.id }, SECRET_KEY, {
+      expiresIn: 86400, // 24 hours
+    });
+
+    res.status(200).send({
+      user: {
+        username: user.username,
+      },
+      token,
+    });
+  } catch (error) {
+    res.status(500).send({ error: 'Login failed!' });
+  }
+});
+
+app.post('/check-availability', async (req, res) => {
   const { checkInDate, checkOutDate } = req.body;
 
   if (!checkInDate || !checkOutDate) {
@@ -84,32 +247,36 @@ app.post('/check-availability', (req, res) => {
 
   // Check if the requested dates are less than 5 days
   const diffTime = Math.abs(checkOut - checkIn);
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   if (diffDays < 5) {
     return res.status(400).json({ error: 'Bookings must be at least 5 days' });
   }
 
-  // Check if the requested dates are available
-  const isAvailable = bookings.every(booking => {
-    const bookedCheckIn = new Date(booking.checkInDate);
-    const bookedCheckOut = new Date(booking.checkOutDate);
+  try {
+    const bookings = await Booking.findAll();
 
-    // Check for overlapping dates
-    return checkOut <= bookedCheckIn || checkIn >= bookedCheckOut;
-  });
+    // Check if the requested dates are available
+    const isAvailable = bookings.every(booking => {
+      const bookedCheckIn = new Date(booking.checkInDate);
+      const bookedCheckOut = new Date(booking.checkOutDate);
 
-  if (isAvailable) {
-    return res.status(200).json({ available: true });
-  } else {
-    return res.status(200).json({ available: false });
+      // Check for overlapping dates
+      return checkOut <= bookedCheckIn || checkIn >= bookedCheckOut;
+    });
+
+    if (isAvailable) {
+      return res.status(200).json({ available: true });
+    } else {
+      return res.status(200).json({ available: false });
+    }
+  } catch (error) {
+    res.status(500).send({ error: 'Failed to check availability!' });
   }
 });
 
-// Make a booking (for testing purposes)
-app.post('/make-booking', (req, res) => {
-  const { checkInDate, checkOutDate } = req.body;
+app.post('/make-booking', async (req, res) => {
+  const { username, checkInDate, checkOutDate } = req.body;
 
-  // Simple validation
   if (!checkInDate || !checkOutDate) {
     return res.status(400).json({ error: 'Check-in and check-out dates are required' });
   }
@@ -118,25 +285,27 @@ app.post('/make-booking', (req, res) => {
   const checkIn = new Date(checkInDate);
   const checkOut = new Date(checkOutDate);
   const diffTime = Math.abs(checkOut - checkIn);
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   if (diffDays < 5) {
     return res.status(400).json({ error: 'Bookings must be at least 5 days' });
   }
 
-  bookings.push({ checkInDate, checkOutDate });
-  return res.status(200).json({ success: true });
+  try {
+    await Booking.create({ username, checkInDate, checkOutDate });
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    res.status(500).send({ error: 'Failed to make booking!' });
+  }
 });
 
 // Contact form endpoint
 app.post('/contact', (req, res) => {
   const { name, email, message } = req.body;
 
-  // Validation
   if (!name || !email || !message) {
     return res.status(400).json({ error: 'All fields are required' });
   }
 
-  // Send email
   const mailOptions = {
     from: email,
     to: process.env.EMAIL_USER,
