@@ -32,6 +32,10 @@ const Contact: React.FC = () => {
   return (
     <div className="p-4 bg-white rounded shadow-md">
       <h1 className="text-3xl font-bold mb-4">Contact Us</h1>
+      <p className="mb-4">Please fill out the form below to get in touch with us.</p>
+      
+      <a href="https://forms.gle/1Ln4yVcMqx2U5AZX9" className="p-4 bg-blue rounded shadow-md"  > Bize ulaşın</a>
+        
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block text-gray-700">Name</label>
