@@ -4,15 +4,16 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
-const nodemailer = require('nodemailer');
+const nodemailer  = require('nodemailer');
 const { Client } = require('pg');
 const { Sequelize, DataTypes } = require('sequelize');
 
+const nodemailerMailjet = require('nodemailer-mailjet-transport');
 dotenv.config(); // Load environment variables from .env file
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const SECRET_KEY = process.env.SECRET_KEY || 'your_default_secret_key';
+const SECRET_KEY = process.env.SECRET_KEY || "remereferf";
 
 const corsOptions = {
     origin: 'http://localhost:5173',
@@ -31,79 +32,37 @@ const client = new Client({
 
 client.connect();
 
-// Nodemailer setup with Mailjet
-const transporter = nodemailer.createTransport({
-  host: 'in-v3.mailjet.com',
-  port: 587,
+const auth = {
   auth: {
-    user: process.env.MAILJET_API_KEY_PUBLIC,
-    pass: process.env.MAILJET_API_KEY_PRIVATE,
-  },
-});
-
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
-  try {
-    const result = await client.query('SELECT * FROM Users WHERE username = $1', [username]);
-    const user = result.rows[0];
-
-    if (!user) {
-      return res.status(404).send({ message: 'User not found!' });
-    }
-
-    const isPasswordValid = bcrypt.compareSync(password, user.password);
-
-    if (!isPasswordValid) {
-      return res.status(401).send({ message: 'Invalid password!' });
-    }
-
-    const token = jwt.sign({ id: user.username }, SECRET_KEY, {
-      expiresIn: 86400, // 24 hours
-    });
-
-    res.status(200).send({
-      user: {
-        username: user.username,
-      },
-      token,
-    });
-  } catch (error) {
-    res.status(500).send({ error: 'Database error: ' + error.message });
+    apiKey: process.env.MAILJET_API_KEY_PUBLIC,
+    apiSecret: process.env.MAILJET_API_KEY_PRIVATE
   }
-});
+};
+const mailjet = nodemailer.createTransport(nodemailerMailjet(auth));
 
+// Mail gönderme rotanızı oluşturun
 app.post('/contact', (req, res) => {
-  const { name, email, message } = req.body;
-
-  if (!name || !email || !message) {
-    return res.status(400).json({ error: 'All fields are required' });
-  }
-
+  // Gönderilecek mailin bilgilerini girin
   const mailOptions = {
-    from: email,
-    to: process.env.EMAIL_USER,
-    subject: 'Contact Form Submission',
-    text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
+    from: 'Gönderen Adı <kullanıcıadresi@mail.com>',
+    to: 'Alıcı Adı <alıcıadresi@mail.com>',
+    subject: 'Konu',
+    text: 'Mail içeriği'
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error('Error sending email:', error);
-      return res.status(500).json({ error: 'Failed to send email', details: error.toString() });
-    } else {
-      return res.status(200).json({ success: 'Message sent successfully!' });
-    }
-  });
+  // Maili gönderin
+  mailjet
+    .post('send', {
+      messages: [mailOptions]
+    })
+    .then(() => {
+      res.json({ message: 'Mail gönderildi!' });
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).json({ error: 'Mail gönderme sırasında bir hata oluştu!' });
+    });
 });
-
-
-
-
-
-
-app.use(bodyParser.json());
-app.use(cors(corsOptions));
 
 // Sequelize setup
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
@@ -121,6 +80,7 @@ const User = sequelize.define('User', {
   },
 });
 
+
 const Booking = sequelize.define('Booking', {
   username: {
     type: DataTypes.STRING,
@@ -136,22 +96,6 @@ const Booking = sequelize.define('Booking', {
   },
 });
 
-app.get('/test-email', async (req, res) => {
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: process.env.EMAIL_USER,
-    subject: 'Test Email',
-    text: 'This is a test email.',
-  };
-
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      return res.status(500).json({ error: 'Failed to send email', details: error.toString() });
-    } else {
-      return res.status(200).json({ success: 'Test email sent successfully!' });
-    }
-  });
-});
 
 
 app.post('/register', async (req, res) => {
@@ -162,7 +106,7 @@ app.post('/register', async (req, res) => {
     await User.create({ username, password: hashedPassword });
     res.status(201).send({ message: 'User registered successfully!' });
   } catch (error) {
-    res.status(500).send({ error: 'Registration failed!' });
+    res.status(500).send({ error: 'Database error: ' + error.message });
   }
 });
 
@@ -173,29 +117,24 @@ app.post('/login', async (req, res) => {
     const user = await User.findOne({ where: { username } });
 
     if (!user) {
-      return res.status(404).send({ message: 'User not found!' });
+      return res.status(401).send({ message: 'User not found!' });
     }
 
-    const isPasswordValid = bcrypt.compareSync(password, user.password);
-
-    if (!isPasswordValid) {
-      return res.status(401).send({ message: 'Invalid password!' });
+    const passwordIsValid = bcrypt.compareSync(password, user.password);
+    if (!passwordIsValid) {
+      return res.status(401).send({ message: 'Invalid Password!' });
     }
 
     const token = jwt.sign({ id: user.id }, SECRET_KEY, {
-      expiresIn: 86400, // 24 hours
+      expiresIn: 86400 // expires in 24 hours
     });
 
-    res.status(200).send({
-      user: {
-        username: user.username,
-      },
-      token,
-    });
+    res.status(200).send({ auth: true, token , user: { id: user.id, username: user.username } }); 
   } catch (error) {
-    res.status(500).send({ error: 'Login failed!' });
+    res.status(500).send({ error: 'Database error: ' + error.message });
   }
 });
+
 
 app.post('/check-availability', async (req, res) => {
   const { checkInDate, checkOutDate } = req.body;
