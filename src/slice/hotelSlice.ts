@@ -21,6 +21,23 @@ export const fetchHotels = createAsyncThunk(
   }
 );
 
+export const fetchHotelById = createAsyncThunk(
+  "hotel/fetchHotelById",
+  async (id: string) => {
+    const response = await axios.get<Hotel>(`http://localhost:3000/hotels/${id}`);
+    return response.data;
+  }
+);
+
+
+export const fetchRoomsByHotel = createAsyncThunk(
+  "hotel/fetchRoomsByHotel",
+  async (id: string) => {
+    const response = await axios.get(`http://localhost:3000/hotels/${id}/rooms`);
+    return response.data;
+  }
+);
+
   
   const initialState: HotelState = {
       hotel: null,

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { getBookings, getBookingById, createBooking, updateBooking, deleteBooking } from '../controllers/bookingController';
 import { getHotels, getHotelById } from '../controllers/hotelController';
 import { getRoomsByHotel, createRoom } from '../controllers/roomController';
-// /api routes
+import { fetchRoomsForHotel } from '../controllers/checkAvailabilityController';
 const router = Router();
 
 router.get('/bookings', getBookings);
@@ -17,4 +17,9 @@ router.get('/hotels/:id', getHotelById);
 router.get('/hotels/:id/rooms', getRoomsByHotel);
 router.post('/hotels/:id/rooms', createRoom);
 
+router.get('/check-availability/:id');
+
+router.get('/check-availability/:hotelId', fetchRoomsForHotel);
+
 export default router;
+
