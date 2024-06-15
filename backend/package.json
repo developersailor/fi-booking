@@ -2,15 +2,16 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
-"scripts": {
-  "start": "node dist/server.js",
-  "build": "babel . -d dist --ignore node_modules"
-},
+  "scripts": {
+    "start": "babel-node server.js",
+    "build": "babel . -d dist --ignore node_modules"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@babel/node": "^7.24.7",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
