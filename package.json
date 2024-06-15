@@ -9,7 +9,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "backend": "cd backend && npm run start",
-    "fullstack": " npm run dev && npm run backend"
+    "fullstack": "npm run dev && npm run backend"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.5",
