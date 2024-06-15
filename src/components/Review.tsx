@@ -1,19 +1,13 @@
-import React from 'react';
+interface ReviewProps {
+  hotelId: number;
+}
 
-const Review: React.FC = () => {
+const Review: React.FC<ReviewProps> = ({ hotelId }) => {
+  // Fetch and display reviews based on hotel ID
   return (
-    <div className="p-4 bg-gray-100 rounded">
-      <div className="flex items-center">
-        <img src="/src/assets/5677.jpg" alt="Reviewer" className="w-16 h-12 rounded-full mr-4" />
-        <div>
-          <h4 className="font-bold">Kaveh</h4>
-          <p className="text-gray-500">April 2023</p>
-        </div>
-      </div>
-      <p className="mt-4">Everything was great. Sabina was very kind and responsive.
-        She alaways answered our questions and helped us with everything we needed.
-        Check in was very smooth.
-      </p>
+    <div>
+      {/* Reviews for hotel */}
+      Reviews for hotel ID {hotelId}
     </div>
   );
 };

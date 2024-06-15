@@ -9,14 +9,14 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      username: {
-        type: Sequelize.STRING
-      },
       checkInDate: {
         type: Sequelize.DATE
       },
       checkOutDate: {
         type: Sequelize.DATE
+      },
+      hotelId: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

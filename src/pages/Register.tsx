@@ -1,27 +1,28 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { RootState, AppDispatch } from '../store/store';
-import { register } from '../slice/authSlice';
 
 const Register: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
-  const { error } = useSelector((state: RootState) => state.auth);
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [hotelId, setHotelId] = useState<string>('');
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const resultAction = await dispatch(register({ username, password }));
-    if (register.fulfilled.match(resultAction)) {
-      navigate('/');
-    }
+
+    const response = await fetch('http://localhost:3000/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password, hotelId }),
+    });
+
+    const data = await response.json();
+    console.log(data);
   };
 
   return (
-    <div className="p-4 bg-white rounded shadow-md max-w-sm mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Register</h2>
+    <div className="p-4 bg-white rounded shadow-md">
+      <h1 className="text-3xl font-bold mb-4">Register</h1>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block text-gray-700">Username</label>
@@ -30,6 +31,7 @@ const Register: React.FC = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="mt-2 p-2 border rounded w-full"
+            required
           />
         </div>
         <div className="mb-4">
@@ -39,9 +41,19 @@ const Register: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="mt-2 p-2 border rounded w-full"
+            required
           />
         </div>
-        {error && <div className="text-red-600">{error}</div>}
+        <div className="mb-4">
+          <label className="block text-gray-700">Hotel ID</label>
+          <input
+            type="text"
+            value={hotelId}
+            onChange={(e) => setHotelId(e.target.value)}
+            className="mt-2 p-2 border rounded w-full"
+            required
+          />
+        </div>
         <button type="submit" className="px-4 py-2 bg-black text-white rounded">
           Register
         </button>

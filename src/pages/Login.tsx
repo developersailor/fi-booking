@@ -5,23 +5,31 @@ import { RootState, AppDispatch } from '../store/store';
 import { login } from '../slice/authSlice';
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [hotelId, setHotelId] = useState<string>('');
+
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { error } = useSelector((state: RootState) => state.auth);
+  const authStatus = useSelector((state: RootState) => state.auth.status);
+  const authError = useSelector((state: RootState) => state.auth.error);
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const resultAction = await dispatch(login({ username, password }));
-    if (login.fulfilled.match(resultAction)) {
-      navigate('/');
-    }
+    dispatch(login({ username, password, hotelId }))
+      .unwrap()
+      .then(() => {
+        navigate('/dashboard'); // Navigate to dashboard after successful login
+      })
+      .catch((error) => {
+        console.error('Failed to login:', error);
+      });
   };
 
   return (
-    <div className="p-4 bg-white rounded shadow-md max-w-sm mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Login</h2>
+    <div className="p-4 bg-white rounded shadow-md">
+      <h1 className="text-3xl font-bold mb-4">Login</h1>
+      {authStatus === 'failed' && <p className="text-red-500">{authError}</p>}
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block text-gray-700">Username</label>
@@ -30,6 +38,7 @@ const Login: React.FC = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="mt-2 p-2 border rounded w-full"
+            required
           />
         </div>
         <div className="mb-4">
@@ -39,9 +48,19 @@ const Login: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="mt-2 p-2 border rounded w-full"
+            required
           />
         </div>
-        {error && <div className="text-red-600">{error}</div>}
+        <div className="mb-4">
+          <label className="block text-gray-700">Hotel ID</label>
+          <input
+            type="text"
+            value={hotelId}
+            onChange={(e) => setHotelId(e.target.value)}
+            className="mt-2 p-2 border rounded w-full"
+            required
+          />
+        </div>
         <button type="submit" className="px-4 py-2 bg-black text-white rounded">
           Login
         </button>

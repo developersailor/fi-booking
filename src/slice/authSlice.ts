@@ -13,15 +13,31 @@ const initialState: AuthState = {
   token: null,
   loading: false,
   error: null,
+  status: 'loading'
 };
 
 export const login = createAsyncThunk(
   'auth/login',
-  async (credentials: { username: string; password: string }) => {
-    const response = await axios.post('http://localhost:3000/login', credentials);
-    return response.data;
+  async (user: { username: string; password: string; hotelId: string }) => {
+    const response = await fetch('http://localhost:3000/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user),
+    });
+    return response.json();
   }
 );
+
+interface AuthState {
+  user: { username: string } | null;
+  token: string | null;
+  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  error: string | null;
+}
+
+
 
 export const register = createAsyncThunk(
   'auth/register',
