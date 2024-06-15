@@ -7,6 +7,7 @@ const store = configureStore({
     availability: availabilityReducer,
     auth: authReducer,
     hotel: hotelSlice,
+    
   },
 });
 

@@ -16,7 +16,7 @@ const CheckAvailability: React.FC = () => {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await axios.get(`/api/hotels/${hotelId}/rooms`);
+        const response = await axios.get(`http://localhost:3000/check-availability/${hotelId}`);
         setRooms(response.data);
       } catch (error) {
         console.error('Error fetching rooms:', error);

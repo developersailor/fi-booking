@@ -1,52 +1,43 @@
-import { createSlice,createAsyncThunk, Draft } from "@reduxjs/toolkit";
-import axiosInstance from "../axiosInstance";
-import { SerializedError } from "@reduxjs/toolkit";
+import { createSlice,createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
-interface HotelState {
-  hotels: Hotel[] | null;
-  loading: boolean;
-  error: string | Draft<SerializedError> | null;
-}
+
+import axios from "axios";
 
 interface Hotel {
   id: string;
   name: string;
   location: string;
 }
-
-const initialState: HotelState = {
-  hotels: null,
-  loading: false,
-  error: null,
-};
-
+interface HotelState {
+    hotel: Hotel[] | null;
+    loading: boolean;
+    error: Error | null;
+  }
 export const fetchHotels = createAsyncThunk(
   "hotel/fetchHotels",
   async () => {
-    const response = await axiosInstance.get("hotels");
+    const response = await axios.get<Hotel[]>('http://localhost:3000/hotels');
     return response.data;
   }
 );
 
-const hotelSlice = createSlice({
-  name: "hotel",
-  initialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchHotels.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchHotels.fulfilled, (state, action) => {
-        state.loading = false;
-        state.hotels = action.payload;
-      })
-      .addCase(fetchHotels.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error;
-      });
-  },
-});
+  
+  const initialState: HotelState = {
+      hotel: null,
+      loading: false,
+      error: null
+  };
+  
+  export const hotelSlice = createSlice({
+    name: 'hotel',
+    initialState,
+    reducers: {
+      setHotel: (state, action: PayloadAction<Hotel>) => {
+        state.hotel = [action.payload];
+      },
+    },
+  });
+  
+  export const { setHotel } = hotelSlice.actions;
 
-export default hotelSlice.reducer;
+  export default hotelSlice.reducer;

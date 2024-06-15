@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getHotelById = exports.getHotels = void 0;
+exports.createHotel = exports.getHotelById = exports.getHotels = void 0;
 const models_1 = __importDefault(require("../models"));
 const { Hotel } = models_1.default;
 const getHotels = async (req, res) => {
@@ -32,4 +32,14 @@ const getHotelById = async (req, res) => {
     }
 };
 exports.getHotelById = getHotelById;
+const createHotel = async (req, res) => {
+    try {
+        const newHotel = await Hotel.create(req.body);
+        res.status(201).json(newHotel);
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Failed to create hotel' });
+    }
+};
+exports.createHotel = createHotel;
 //# sourceMappingURL=hotelController.js.map

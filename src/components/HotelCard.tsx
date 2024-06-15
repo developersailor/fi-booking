@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setHotel } from '../slice/hotelSlice';
 
 interface Image {
   url: string;
 }
 
 interface Hotel {
-  id: number;
+  id: string; // Update the type of id to string
   name: string;
   description: string;
   images: Image[];
+  location: string; // Added missing property
 }
 
 interface HotelCardProps {
@@ -17,6 +20,12 @@ interface HotelCardProps {
 }
 
 const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(setHotel(hotel));
+  }, [hotel, dispatch]);
+
   return (
     <div className="p-4 border rounded-lg">
       <h2 className="text-2xl font-bold">{hotel.name}</h2>

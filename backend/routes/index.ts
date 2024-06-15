@@ -3,10 +3,7 @@ import { getBookings, getBookingById, createBooking, updateBooking, deleteBookin
 import { getHotels, getHotelById } from '../controllers/hotelController';
 import { getRoomsByHotel, createRoom } from '../controllers/roomController';
 // /api routes
-const router = Router({
-    mergeParams: true,
-    strict: true
-});
+const router = Router();
 
 router.get('/bookings', getBookings);
 router.get('/bookings/:id', getBookingById);

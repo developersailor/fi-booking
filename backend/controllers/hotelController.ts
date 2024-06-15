@@ -24,3 +24,12 @@ export const getHotelById = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch hotel' });
   }
 };
+
+export const createHotel = async (req: Request, res: Response) => {
+  try {
+    const newHotel = await Hotel.create(req.body);
+    res.status(201).json(newHotel);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create hotel' });
+  }
+};
