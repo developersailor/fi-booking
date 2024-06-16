@@ -11,10 +11,19 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const index_1 = require("./models/index");
 Object.defineProperty(exports, "sequelize", { enumerable: true, get: function () { return index_1.sequelize; } });
-const index_2 = __importDefault(require("./routes/index"));
-dotenv_1.default.config();
+const path_1 = __importDefault(require("path")); // Import the 'path' module
+const swagger_1 = require("./swagger"); // Swagger konfigürasyonunu içe aktarın
+const index_2 = __importDefault(require("./routes/index")); // Route'ları içe aktarın
 const app = (0, express_1.default)();
 exports.app = app;
+dotenv_1.default.config();
+app.use(express_1.default.json());
+// Route'ları ekleyin
+app.use('/api', index_2.default);
+// Swagger'ı kurun
+(0, swagger_1.setupSwagger)(app);
+const pathToSwaggerUi = path_1.default.join(__dirname, 'swagger-ui'); // Define the 'pathToSwaggerUi' variable
+app.use(express_1.default.static(pathToSwaggerUi));
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const corsOptions = {
     origin: 'http://localhost:5173',
@@ -53,7 +62,6 @@ app.post('/contact', (req, res) => {
     });
 });
 index_1.sequelize.sync().then(() => {
-    app.listen(PORT, () => {
-    });
+    app.listen(PORT);
 });
 //# sourceMappingURL=server.js.map

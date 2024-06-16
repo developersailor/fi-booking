@@ -4,11 +4,25 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
 import { sequelize } from './models/index';
+import path from 'path'; // Import the 'path' module
 
-import routes from './routes/index';
+import { setupSwagger } from './swagger'; // Swagger konfigürasyonunu içe aktarın
+import routes from './routes/index'; // Route'ları içe aktarın
 
-dotenv.config();
 const app = express();
+dotenv.config();
+app.use(express.json());
+
+// Route'ları ekleyin
+app.use('/api', routes);
+
+// Swagger'ı kurun
+setupSwagger(app);
+
+const pathToSwaggerUi = path.join(__dirname, 'swagger-ui'); // Define the 'pathToSwaggerUi' variable
+
+app.use(express.static(pathToSwaggerUi))
+
 const PORT: number = parseInt(process.env.PORT || '3000', 10);
 
 const corsOptions: cors.CorsOptions = {
@@ -54,9 +68,7 @@ app.post('/contact', (req: Request, res: Response) => {
 });
 
 sequelize.sync().then(() => {
-  app.listen(PORT, () => {
-
-  });
+  app.listen(PORT);
 });
 
 export { app, sequelize };
