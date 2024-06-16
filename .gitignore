@@ -26,3 +26,6 @@ dist-ssr
 config.json
 build/
 dist/
+backend/build
+backend/dist
+dist/

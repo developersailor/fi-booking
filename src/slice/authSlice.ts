@@ -27,10 +27,9 @@ export const login = createAsyncThunk(
   async ({ username, password, hotelId }: LoginData) => {
     // Implement logic to send login request to your Express backend API
     // and return the user data or a success message upon successful login
-    const response = await axios.post('http://localhost:3000/login', {
-     
+    const response = await axios.post('http://localhost:3000/login', { username, password, hotelId }, {     
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password, hotelId }),
+      
     });
     const data = await response.data;
     if (response.status === 200) {
