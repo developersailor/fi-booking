@@ -29,9 +29,8 @@ export const fetchHotels = createAsyncThunk<HotelData[]>(
 export const addHotel = createAsyncThunk<HotelData, HotelData>(
   "admin/addHotel",
   async (hotel) => {
-    const response = await axios.post<HotelData>('http://localhost:3000/hotels', {
-      hotel:hotel
-    }, {
+    const response = await axios.post<HotelData>('http://localhost:3000/hotels', 
+      hotel, {
       headers: {
         'Content-Type': 'application/json',
       },

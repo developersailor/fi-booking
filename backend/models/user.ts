@@ -1,6 +1,6 @@
 // models/User.ts
 
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes, Sequelize } from 'sequelize';
 import sequelize from '../sequelize'; // Sequelize bağlantısını burada içe aktarıyoruz
 
 class User extends Model {
@@ -23,6 +23,14 @@ User.init(
     },
     password: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false, // Or provide a default value here (e.g., defaultValue: Sequelize.NOW)
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
       allowNull: false,
     },
   },

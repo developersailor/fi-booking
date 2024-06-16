@@ -18,7 +18,7 @@ const Login: React.FC = () => {
     event.preventDefault();
     try {
       await dispatch(login({ username, password, hotelId }));
-      navigate('/dashboard'); // Navigate to dashboard after successful login
+      navigate('/admin'); // Navigate to dashboard after successful login
     } catch (error) {
       console.error('Failed to login:', error);
     }

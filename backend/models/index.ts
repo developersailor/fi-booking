@@ -3,7 +3,7 @@ import HotelFactory from './hotel';
 import RoomFactory from './room';
 import BookingFactory from './booking';
 
-const sequelize = new Sequelize('fibooking_development', process.env.DB_USERNAME, process.env.DB_PASSWORD, {
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USERNAME, process.env.DB_PASSWORD, {
   dialect: 'postgres',
   host: 'localhost',
   port: 5432,
