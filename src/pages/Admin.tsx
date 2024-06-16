@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  // Add other properties as needed
+}
+
 const Admin: React.FC = () => {
-  const [users, setUsers] = useState<Array<unknown>>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/users'); // Replace with your backend API endpoint
+        const response = await axios.get('http://localhost:3000/users');
         setUsers(response.data);
         setLoading(false);
       } catch (error) {
@@ -24,7 +31,7 @@ const Admin: React.FC = () => {
 
   const deleteUser = async (userId: number) => {
     try {
-      await axios.delete(`http://localhost:3000/api/users/${userId}`); // Replace with your backend API endpoint for deleting users
+      await axios.delete(`http://localhost:3000/users/${userId}`);
       setUsers(users.filter((user) => user.id !== userId));
     } catch (error) {
       console.error('Error deleting user:', error);
@@ -49,7 +56,7 @@ const Admin: React.FC = () => {
         <p>No users found.</p>
       ) : (
         <ul>
-          {users.map(user => (
+          {users.map((user) => (
             <li key={user.id}>
               {user.name} - {user.email} 
               <button onClick={() => deleteUser(user.id)}>Delete</button>

@@ -3,6 +3,8 @@ import { getBookings, getBookingById, createBooking, updateBooking, deleteBookin
 import { getHotels, getHotelById } from '../controllers/hotelController';
 import { getRoomsByHotel, createRoom } from '../controllers/roomController';
 import { fetchRoomsForHotel } from '../controllers/checkAvailabilityController';
+import { login, logout } from '../controllers/userController';
+import { register } from '../controllers/userController';
 const router = Router();
 
 router.get('/bookings', getBookings);
@@ -20,6 +22,11 @@ router.post('/hotels/:id/rooms', createRoom);
 router.get('/check-availability/:id');
 
 router.get('/check-availability/:hotelId', fetchRoomsForHotel);
+
+
+router.post('/register', register);
+router.post('/login', login);
+router.post('/logout', logout);
 
 export default router;
 

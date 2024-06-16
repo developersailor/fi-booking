@@ -5,6 +5,8 @@ const bookingController_1 = require("../controllers/bookingController");
 const hotelController_1 = require("../controllers/hotelController");
 const roomController_1 = require("../controllers/roomController");
 const checkAvailabilityController_1 = require("../controllers/checkAvailabilityController");
+const userController_1 = require("../controllers/userController");
+const userController_2 = require("../controllers/userController");
 const router = (0, express_1.Router)();
 router.get('/bookings', bookingController_1.getBookings);
 router.get('/bookings/:id', bookingController_1.getBookingById);
@@ -17,5 +19,8 @@ router.get('/hotels/:id/rooms', roomController_1.getRoomsByHotel);
 router.post('/hotels/:id/rooms', roomController_1.createRoom);
 router.get('/check-availability/:id');
 router.get('/check-availability/:hotelId', checkAvailabilityController_1.fetchRoomsForHotel);
+router.post('/register', userController_2.register);
+router.post('/login', userController_1.login);
+router.post('/logout', userController_1.logout);
 exports.default = router;
 //# sourceMappingURL=index.js.map

@@ -1,34 +1,36 @@
-import { Model, DataTypes, Sequelize } from 'sequelize';
+// models/User.ts
 
-interface UserAttributes {
-  username: string;
-  password: string;
-}
+import { Model, DataTypes } from 'sequelize';
+import sequelize from '../sequelize'; // Sequelize bağlantısını burada içe aktarıyoruz
 
-class User extends Model<UserAttributes> {
+class User extends Model {
+  public id!: number;
   public username!: string;
   public password!: string;
-
-  public static associate(models: any): void {
-    User.hasMany(models.Post, {
-      foreignKey: 'userId',
-      as: 'posts'
-    });
-    User.hasMany(models.Booking, {
-      foreignKey: 'userId',
-      as: 'bookings'
-    });
-  }
 }
 
-export default (sequelize: Sequelize) => {
-  User.init({
-    username: DataTypes.STRING,
-    password: DataTypes.STRING
-  }, {
+User.init(
+  {
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  },
+  {
     sequelize,
-    modelName: 'User',
-  });
+    modelName: 'User', // Model adını burada belirtiyoruz
+    tableName: 'users', // Veritabanındaki tablo adını belirtiyoruz (varsayılan olarak 'users')
+  }
+);
 
-  return User;
-};
+export default User;
