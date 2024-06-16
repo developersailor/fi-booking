@@ -552,5 +552,38 @@ router.post('/login', userController_1.login);
  *         description: Some server error
  */
 router.post('/logout', userController_1.logout);
+/**
+ * @swagger
+ * /createUser:
+ *   post:
+ *     summary: Creates a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: The user was successfully created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: The request was invalid
+ *       500:
+ *         description: There was an error creating the user
+ */
+router.post('/createUser', userController_1.createUser);
 exports.default = router;
 //# sourceMappingURL=index.js.map

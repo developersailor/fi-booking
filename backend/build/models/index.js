@@ -12,6 +12,7 @@ const sequelize = new sequelize_1.Sequelize('fibooking_development', process.env
     dialect: 'postgres',
     host: 'localhost',
     port: 5432,
+    logging: false,
 });
 exports.sequelize = sequelize;
 const Hotel = (0, hotel_1.default)(sequelize, sequelize_1.DataTypes);

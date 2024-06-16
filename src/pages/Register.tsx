@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 
 const Register: React.FC = () => {
@@ -8,15 +9,16 @@ const Register: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const response = await fetch('http://localhost:3000/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password, hotelId }),
-    });
+    const response = await axios.post('http://localhost:3000/register', 
+      { username, password, hotelId },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
-    const data = await response.json();
+    const data = await response.data;
     console.log(data);
   };
 

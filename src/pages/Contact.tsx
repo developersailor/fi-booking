@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 
 const Contact: React.FC = () => {
@@ -10,16 +11,15 @@ const Contact: React.FC = () => {
     event.preventDefault();
 
     try {
-      const res = await fetch('http://localhost:3000/contact', {
-        method: 'POST',
+      const response = await axios.post('http://localhost:3000/contact', {
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ name, email, message }),
       });
 
-      const data = await res.json();
-      if (data.success) {
+      const data = await response.data;
+      if (data && data.success) {
         setResponse('Message sent successfully!');
       } else {
         setResponse('Failed to send message.');

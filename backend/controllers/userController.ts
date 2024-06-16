@@ -2,7 +2,7 @@
 
 import { Request, Response } from 'express';
 import User from '../models/user';
-
+import bcrypt from 'bcryptjs';
 // Kayıt işlemi
 export const register = async (req: Request, res: Response): Promise<void> => {
   const { username, password } = req.body;
@@ -15,8 +15,11 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    // Parolayı hashle
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     // Yeni kullanıcı oluştur
-    const newUser = await User.create({ username, password });
+    const newUser = await User.create({ username, password: hashedPassword });
 
     res.status(201).json({ message: 'Kullanıcı başarıyla kaydedildi', user: newUser });
   } catch (error) {
@@ -34,7 +37,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const user = await User.findOne({ where: { username } });
 
     // Kullanıcıyı kontrol et
-    if (!user || user.password !== password) {
+    if (!user) {
+      res.status(401).json({ error: 'Kullanıcı adı veya parola hatalı' });
+      return;
+    }
+
+    // Parolayı kontrol et
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
       res.status(401).json({ error: 'Kullanıcı adı veya parola hatalı' });
       return;
     }
@@ -49,4 +59,16 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 // Çıkış işlemi (bu örnekte basit bir çıkış işlemidir)
 export const logout = async (req: Request, res: Response): Promise<void> => {
   res.json({ message: 'Çıkış başarılı' });
+};
+
+export const createUser = async (req: Request, res: Response) => {
+  try {
+    const { username, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await User.create({ username, password: hashedPassword });
+    res.status(201).json(newUser);
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ error: 'Failed to create user' });
+  }
 };

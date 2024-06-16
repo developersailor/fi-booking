@@ -19,7 +19,7 @@ exports.app = app;
 dotenv_1.default.config();
 app.use(express_1.default.json());
 // Route'ları ekleyin
-app.use('/api', index_2.default);
+app.use(index_2.default);
 // Swagger'ı kurun
 (0, swagger_1.setupSwagger)(app);
 const pathToSwaggerUi = path_1.default.join(__dirname, 'swagger-ui'); // Define the 'pathToSwaggerUi' variable

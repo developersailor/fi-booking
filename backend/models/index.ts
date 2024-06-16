@@ -7,6 +7,7 @@ const sequelize = new Sequelize('fibooking_development', process.env.DB_USERNAME
   dialect: 'postgres',
   host: 'localhost',
   port: 5432,
+  
 });
 
 const Hotel = HotelFactory(sequelize, DataTypes);

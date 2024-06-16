@@ -11,29 +11,30 @@ import routes from './routes/index'; // Route'ları içe aktarın
 
 const app = express();
 dotenv.config();
-app.use(express.json());
+
+// Body parser middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// CORS ayarları
+const corsOptions: cors.CorsOptions = {
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Access-Control-Allow-Methods'],
+  credentials: true,
+};
+app.use(cors(corsOptions));
 
 // Route'ları ekleyin
-app.use('/api', routes);
+app.use(routes);
 
 // Swagger'ı kurun
 setupSwagger(app);
 
 const pathToSwaggerUi = path.join(__dirname, 'swagger-ui'); // Define the 'pathToSwaggerUi' variable
-
-app.use(express.static(pathToSwaggerUi))
+app.use(express.static(pathToSwaggerUi));
 
 const PORT: number = parseInt(process.env.PORT || '3000', 10);
-
-const corsOptions: cors.CorsOptions = {
-  origin: 'http://localhost:5173',
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type'],
-};
-
-app.use(bodyParser.json());
-app.use(cors(corsOptions));
-app.use(routes);
 
 // Nodemailer setup
 const transporter = nodemailer.createTransport({
@@ -58,17 +59,21 @@ app.post('/contact', (req: Request, res: Response) => {
     text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
   };
 
-  transporter.sendMail(mailOptions, (error:Error) => {
-      if (error) {
-        return res.status(500).json({ error: 'Failed to send email' });
-      } else {
-        return res.status(200).json({ success: 'Message sent successfully!' });
-      }
-    });
+  transporter.sendMail(mailOptions, (error: Error | null) => {
+    if (error) {
+      return res.status(500).json({ error: 'Failed to send email' });
+    } else {
+      return res.status(200).json({ success: 'Message sent successfully!' });
+    }
+  });
 });
 
 sequelize.sync().then(() => {
-  app.listen(PORT);
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}).catch((err: Error) => {
+  console.error('Unable to connect to the database:', err);
 });
 
 export { app, sequelize };

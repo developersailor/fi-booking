@@ -27,13 +27,13 @@ export const login = createAsyncThunk(
   async ({ username, password, hotelId }: LoginData) => {
     // Implement logic to send login request to your Express backend API
     // and return the user data or a success message upon successful login
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
+    const response = await axios.post('http://localhost:3000/auth/login', {
+     
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password, hotelId }),
     });
-    const data = await response.json();
-    if (response.ok) {
+    const data = await response.data;
+    if (response.status === 200) {
       return data; // Return user data or success message
     } else {
       throw new Error('Login failed'); // Throw error on failed login
@@ -54,6 +54,7 @@ export const register = createAsyncThunk(
   'auth/register',
   async (credentials: { username: string; password: string }) => {
     const response = await axios.post('http://localhost:3000/register', credentials);
+    console.log(response.data);
     return response.data;
   }
 );

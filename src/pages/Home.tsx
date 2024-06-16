@@ -1,32 +1,36 @@
-// src/pages/Home.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {  setHotels } from '../slice/hotelSlice'; // fetchHotels ekleyelim
 import HomeDetails from '../components/HomeDetails';
+import { RootState } from '../store/store';
 import { HotelData } from '../types/HotelData';
-import axios from 'axios';
 
 const Home: React.FC = () => {
-  const [hotels, setHotels] = useState<HotelData[]>([]);
+  const dispatch = useDispatch();
+  const hotels = useSelector((state: RootState) => state.hotel.hotel); // Doğru yolu kullanarak 'hotel' dizisine erişelim
 
   useEffect(() => {
     const fetchHotels = async () => {
-      // Fetch data from your backend
-      const response = await axios.get<HotelData[]>('http://localhost:3000/hotels');
-      const data = await response.data;
-      setHotels(data);
-    };
-
+      try {
+        const response = await fetch('http://localhost:3000/hotels');
+        const data = await response.json();
+        dispatch(setHotels(data));
+      } catch (error) {
+        console.error('Failed to fetch hotels:', error);
+      }
+    }
     fetchHotels();
-  }, []);
+  }, [dispatch]);
 
-  return hotels.length > 0 ? (
+  return hotels && hotels.length > 0 ? ( // hotels.hotel yerine hotels kullanıyoruz
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {hotels.map((hotel) => (
+      {hotels.map((hotel: HotelData) => (
         <HomeDetails key={hotel.id} hotel={hotel} />
       ))}
-    </div>) :
-    (
-      <p className="text-center text-2xl mt-4">Loading...</p>
-    );
+    </div>
+  ) : (
+    <p className="text-center text-2xl mt-4">Loading...</p>
+  );
 };
 
 export default Home;

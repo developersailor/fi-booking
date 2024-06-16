@@ -1,71 +1,99 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchHotels, addHotel, updateHotel, deleteHotel } from '../slice/adminSlice';
+import { RootState, AppDispatch } from '../store/store';
+import { HotelData } from '../types/HotelData';
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  // Add other properties as needed
-}
-
-const Admin: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+const AdminPanel: React.FC = () => {
+  const dispatch: AppDispatch = useDispatch();
+  const { hotels, loading, error } = useSelector((state: RootState) => state.admin);
+  const [newHotel, setNewHotel] = useState<HotelData>({
+    id: 0,
+    name: '',
+    location: '',
+    pricePerNight: 0,
+    guests: 0,
+    bedrooms: 0,
+    bathrooms: 0,
+    reviews: 0,
+    rating: 0,
+    images: [],
+    description: '',
+    amenities: []
+  });
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/users');
-        setUsers(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-        setError('Error fetching users. Please try again later.');
-        setLoading(false);
-      }
-    };
+    dispatch(fetchHotels());
+  }, [dispatch]);
 
-    fetchUsers();
-  }, []);
-
-  const deleteUser = async (userId: number) => {
-    try {
-      await axios.delete(`http://localhost:3000/users/${userId}`);
-      setUsers(users.filter((user) => user.id !== userId));
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      setError('Error deleting user. Please try again later.');
-    }
+  const handleAddHotel = () => {
+    dispatch(addHotel(newHotel));
+    setNewHotel({
+      id: 0,
+      name: '',
+      location: '',
+      pricePerNight: 0,
+      guests: 0,
+      bedrooms: 0,
+      bathrooms: 0,
+      reviews: 0,
+      rating: 0,
+      images: [],
+      description: '',
+      amenities: []
+    });
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const handleUpdateHotel = (hotel: HotelData) => {
+    dispatch(updateHotel(hotel));
+  };
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  const handleDeleteHotel = (id: number) => {
+    dispatch(deleteHotel(id));
+  };
 
   return (
-    <div>
-      <h1>Admin Page</h1>
-      
-      <h2>Users</h2>
-      {users.length === 0 ? (
-        <p>No users found.</p>
-      ) : (
-        <ul>
-          {users.map((user) => (
-            <li key={user.id}>
-              {user.name} - {user.email} 
-              <button onClick={() => deleteUser(user.id)}>Delete</button>
-            </li>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Admin Panel</h1>
+
+      {loading && <p>Loading...</p>}
+      {error && <p>Error: {error.message}</p>}
+
+      <div className="mb-4">
+        <h2 className="text-xl font-bold mb-2">Add New Hotel</h2>
+        <input
+          type="text"
+          placeholder="Name"
+          value={newHotel.name}
+          onChange={(e) => setNewHotel({ ...newHotel, name: e.target.value })}
+          className="border p-2 mr-2"
+        />
+        <input
+          type="text"
+          placeholder="Location"
+          value={newHotel.location}
+          onChange={(e) => setNewHotel({ ...newHotel, location: e.target.value })}
+          className="border p-2 mr-2"
+        />
+        <button onClick={handleAddHotel} className="bg-blue-500 text-white p-2">Add Hotel</button>
+      </div>
+
+      <div>
+        <h2 className="text-xl font-bold mb-2">Hotels</h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {hotels.map((hotel) => (
+            <div key={hotel.id} className="border p-4">
+              <h3 className="font-bold">{hotel.name}</h3>
+              <p>{hotel.location}</p>
+              <p>{hotel.description}</p>
+              <button onClick={() => handleUpdateHotel(hotel)} className="bg-green-500 text-white p-2 mr-2">Update</button>
+              <button onClick={() => handleDeleteHotel(hotel.id)} className="bg-red-500 text-white p-2">Delete</button>
+            </div>
           ))}
-        </ul>
-      )}
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Admin;
+export default AdminPanel;

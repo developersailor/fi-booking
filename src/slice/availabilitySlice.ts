@@ -17,7 +17,7 @@ export const checkAvailability = createAsyncThunk(
   'availability/checkAvailability',
   async (dates: { checkInDate: string; checkOutDate: string }) => {
     const response = await axios.post('http://localhost:3000/check-availability', dates);
-    return response.data.available;
+    return response.data;
   }
 );
 

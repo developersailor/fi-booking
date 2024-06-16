@@ -6,7 +6,9 @@ interface HomeDetailsProps {
   hotel: HotelData;
 }
 
-const HomeDetails: React.FC<HomeDetailsProps> = ({ hotel }) => {
+const HomeDetails: React.FC<HomeDetailsProps> = ({ hotel }: {
+  hotel: HotelData;
+}) => {
   return (
     <div className="bg-white shadow-md rounded-lg overflow-hidden">
       <img src={hotel.images[0]} alt={hotel.name} className="w-full h-64 object-cover" />
