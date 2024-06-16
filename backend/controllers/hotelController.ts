@@ -1,65 +1,107 @@
 import { Request, Response } from 'express';
-import { Sequelize } from 'sequelize';
-import db from '../models'; // Adjust this import based on your Sequelize initialization
-
-const Hotel = db.Hotel; // Assuming db.Hotel is your Sequelize model
-export const getAllHotels = async (req: Request, res: Response) => {
+import { Prisma, PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
+export const getBookings = async (req: Request, res: Response) => {
+  const { userId } = req.query;
   try {
-    const { city } = req.query;
-    const hotels = await Hotel.findAll({ where:{
-      
-    } });
-    res.status(200).json(hotels);
+    const bookings = await prisma.booking.findMany({
+      where: {
+        userId: Number(userId)
+      }
+    });
+    res.status(200).json(bookings);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching hotels', error });
+    res.status(500).json({ error: 'Failed to fetch bookings' });
   }
+  try {
+    const bookings = await prisma.booking.findMany();
+    res.status(200).json(bookings);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch bookings' });
+  }
+};
+export const getAllHotels = async (req: Request, res: Response) => {
+  try{
+    const hotels = await prisma.hotel.findMany();
+    res.status(200).json(hotels);
+  }
+  catch(error){
+    res.status(500).json({message: 'Error fetching hotels', error});
+  }
+
 };
 
 export const getHotelById = async (req: Request, res: Response) => {
+  // Get the hotel ID from the request parameters
   const { id } = req.params;
   try {
-    const hotel = await Hotel.findByPk(id as string);
+    // Find the hotel by ID
+    const hotel = await prisma.hotel.findUnique({
+      where: {
+        id: Number(id)
+      }
+    });
+    // If the hotel is found, return it
     if (hotel) {
       res.status(200).json(hotel);
     } else {
+      // If the hotel is not found, return a 404 error
       res.status(404).json({ message: 'Hotel not found' });
     }
   } catch (error) {
+    // If an error occurs, return a 500 error
     res.status(500).json({ message: 'Error fetching hotel', error });
   }
 };
 export const createHotel = async (req: Request, res: Response) => {
   try {
-    const { name, city, country, price } = req.body;
-    const newHotel = await Hotel.create({ name, city, country, price });
+    const { name, location, pricePerNight } = req.body;
+    const newHotel = await prisma.hotel.create({
+      data: {
+        name,
+        location,
+        pricePerNight,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    });
     res.status(201).json(newHotel);
   } catch (error) {
-    res.status(500).json({ message: 'Error creating hotel', error });
+    res.status(500).json({ error: 'Failed to create hotel' });
   }
 };
 
 
 export const updateHotel = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const { name, location, pricePerNight } = req.body;
   try {
-    const [updated] = await Hotel.update(req.body, { where: { id } });
-    if (updated) {
-      const updatedHotel = await Hotel.findByPk(id as string);
-      res.status(200).json(updatedHotel);
-    } else {
-      res.status(404).json({ message: 'Hotel not found' });
-    }
+    const updatedHotel = await prisma.hotel.update({
+      where: { id: Number(id)},
+      data: {
+        name,
+        location,
+        pricePerNight,
+        updatedAt: new Date()
+      }
+    });
+    res.status(200).json(updatedHotel);
   } catch (error) {
     res.status(500).json({ message: 'Error updating hotel', error });
   }
 };
 
 export const deleteHotel = async (req: Request, res: Response) => {
+
   const { id } = req.params;
   try {
-    const deleted = await Hotel.destroy({ where: { id } });
+    const deleted = await prisma.hotel.delete({
+      where: {
+        id: Number(id)
+      }
+    });
     if (deleted) {
-      res.status(204).json();
+      res.status(204).send();
     } else {
       res.status(404).json({ message: 'Hotel not found' });
     }

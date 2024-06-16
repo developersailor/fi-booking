@@ -1,18 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteBooking = exports.updateBooking = exports.createBooking = exports.getBookingById = exports.getBookings = void 0;
-const sequelize_1 = require("sequelize");
-const booking_1 = require("../models/booking");
-// Initialize Sequelize instance
-const sequelize = new sequelize_1.Sequelize(process.env.DB_NAME, process.env.DB_USERNAME, process.env.DB_PASSWORD, {
-    dialect: 'postgres',
-    host: 'localhost',
-    port: 5432,
-});
+const client_1 = require("@prisma/client");
+const prisma = new client_1.PrismaClient();
 const getBookings = async (req, res) => {
     const { userId } = req.query;
     try {
-        const bookings = await booking_1.Booking.findAll({ where: { userId } });
+        const bookings = await prisma.booking.findMany({
+            where: {
+                userId: Number(userId)
+            }
+        });
+        res.status(200).json(bookings);
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Failed to fetch bookings' });
+    }
+    try {
+        const bookings = await prisma.booking.findMany();
         res.status(200).json(bookings);
     }
     catch (error) {
@@ -23,7 +28,11 @@ exports.getBookings = getBookings;
 const getBookingById = async (req, res) => {
     try {
         const { id } = req.params;
-        const booking = await booking_1.Booking.findByPk(id);
+        const booking = await prisma.booking.findUnique({
+            where: {
+                id: Number(id)
+            }
+        });
         if (booking) {
             res.status(200).json(booking);
         }
@@ -38,8 +47,18 @@ const getBookingById = async (req, res) => {
 exports.getBookingById = getBookingById;
 const createBooking = async (req, res) => {
     try {
-        const { checkInDate, checkOutDate, hotelId, roomId } = req.body;
-        const newBooking = await booking_1.Booking.create({ checkInDate, checkOutDate, hotelId, roomId });
+        const { checkInDate, checkOutDate, hotelId, roomId, userId } = req.body;
+        const newBooking = await prisma.booking.create({
+            data: {
+                checkInDate,
+                checkOutDate,
+                hotelId,
+                roomId,
+                userId: userId,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            }
+        });
         res.status(201).json(newBooking);
     }
     catch (error) {
@@ -52,14 +71,19 @@ const updateBooking = async (req, res) => {
     try {
         const { id } = req.params;
         const { checkInDate, checkOutDate, hotelId, roomId, userId } = req.body;
-        const booking = await booking_1.Booking.findByPk(id);
+        const booking = await prisma.booking.update({
+            where: {
+                id: Number(id)
+            },
+            data: {
+                checkInDate,
+                checkOutDate,
+                hotelId,
+                roomId,
+                userId
+            }
+        });
         if (booking) {
-            booking.checkInDate = checkInDate;
-            booking.checkOutDate = checkOutDate;
-            booking.hotelId = hotelId;
-            booking.roomId = roomId;
-            booking.userId = userId;
-            await booking.save();
             res.status(200).json(booking);
         }
         else {
@@ -74,9 +98,12 @@ exports.updateBooking = updateBooking;
 const deleteBooking = async (req, res) => {
     try {
         const { id } = req.params;
-        const booking = await booking_1.Booking.findByPk(id);
+        const booking = await prisma.booking.delete({
+            where: {
+                id: Number(id)
+            }
+        });
         if (booking) {
-            await booking.destroy();
             res.status(200).json({ message: 'Booking deleted' });
         }
         else {

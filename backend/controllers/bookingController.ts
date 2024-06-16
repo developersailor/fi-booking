@@ -1,24 +1,21 @@
 import { Request, Response } from 'express';
-import { Sequelize } from 'sequelize';
-import Booking from '../models/booking';
+import { Prisma, PrismaClient } from '@prisma/client';
 
-// Initialize Sequelize instance
-const sequelize = new Sequelize(
-  process.env.DB_NAME as string,
-  process.env.DB_USERNAME as string,
-  process.env.DB_PASSWORD as string,
-  {
-    dialect: 'postgres',
-    host: 'localhost',
-    port: 5432,
-  }
-);
-
-
+const prisma = new PrismaClient();
 export const getBookings = async (req: Request, res: Response) => {
   const { userId } = req.query;
   try {
-    const bookings = await Booking.findAll( { where: { userId } });
+    const bookings = await prisma.booking.findMany({
+      where: {
+        userId: Number(userId)
+      }
+    });
+    res.status(200).json(bookings);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch bookings' });
+  }
+  try {
+    const bookings = await prisma.booking.findMany();
     res.status(200).json(bookings);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch bookings' });
@@ -29,7 +26,11 @@ export const getBookings = async (req: Request, res: Response) => {
 export const getBookingById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const booking = await Booking.findByPk(id);
+    const booking = await prisma.booking.findUnique({
+      where: {
+        id: Number(id)
+      }
+    });
     if (booking) {
       res.status(200).json(booking);
     } else {
@@ -44,8 +45,18 @@ export const getBookingById = async (req: Request, res: Response) => {
 
 export const createBooking = async (req: Request, res: Response) => {
   try {
-    const { checkInDate, checkOutDate, hotelId, roomId } = req.body;
-    const newBooking = await Booking.create({ checkInDate, checkOutDate, hotelId, roomId });
+    const { checkInDate, checkOutDate, hotelId, roomId, userId } = req.body;
+    const newBooking = await prisma.booking.create({
+      data: {
+        checkInDate,
+        checkOutDate,
+        hotelId,
+        roomId,
+        userId: userId,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    });
     res.status(201).json(newBooking);
   } catch (error) {
     res.status(500).json({ error: 'Failed to create booking' });
@@ -59,16 +70,23 @@ export const updateBooking = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { checkInDate, checkOutDate, hotelId, roomId, userId } = req.body;
-    const booking = await Booking.findByPk(id);
+    const booking = await prisma.booking.update({
+      where: {
+        id: Number(id)
+      },
+      data: {
+        checkInDate,
+        checkOutDate,
+        hotelId,
+        roomId,
+        userId
+      }
+    });
+   
     if (booking) {
-      booking.checkInDate = checkInDate;
-      booking.checkOutDate = checkOutDate;
-      booking.hotelId = hotelId;
-      booking.roomId = roomId;
-      booking.userId = userId;
-      await booking.save();
       res.status(200).json(booking);
-    } else {
+    }
+    else{
       res.status(404).json({ error: 'Booking not found' });
     }
   } catch (error) {
@@ -79,9 +97,12 @@ export const updateBooking = async (req: Request, res: Response) => {
 export const deleteBooking = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const booking = await Booking.findByPk(id);
+    const booking = await prisma.booking.delete({
+      where: {
+        id: Number(id)
+      }
+    });
     if (booking) {
-      await booking.destroy();
       res.status(200).json({ message: 'Booking deleted' });
     } else {
       res.status(404).json({ error: 'Booking not found' });

@@ -1,47 +1,30 @@
 // controllers/userController.ts
 
 import { Request, Response } from 'express';
-import initUser from '../models/user';
+
 import bcrypt from 'bcryptjs';
-import { Sequelize } from 'sequelize';
-
-// Initialize Sequelize instance
-const sequelize = new Sequelize(
-  process.env.DB_NAME as string,
-  process.env.DB_USERNAME as string,
-  process.env.DB_PASSWORD as string,
-  {
-    dialect: 'postgres',
-    host: 'localhost',
-    port: 5432,
-  }
-);
-
-// Initialize User model
-const User = initUser(sequelize);
+import { Prisma, PrismaClient } from '@prisma/client'; // Import the User class
+const prisma = new PrismaClient();
 
 // Kayıt işlemi
 export const register = async (req: Request, res: Response): Promise<void> => {
   const { username, password } = req.body;
 
   try {
-    // Kullanıcı adının benzersiz olduğunu kontrol et
-    const existingUser = await User.findOne({ where: { username } });
-    if (existingUser) {
-      res.status(400).json({ error: 'Kullanıcı adı zaten kullanımda' });
-      return;
-    }
-
-    // Parolayı hashle
+    // Kullanıcıyı oluştur
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Yeni kullanıcı oluştur
-    const newUser = await User.create({ username, password: hashedPassword });
-
-    res.status(201).json({ message: 'Kullanıcı başarıyla kaydedildi', user: newUser });
+    const newUser = await prisma.user.create({
+      data: {
+        username: username,
+        password: hashedPassword,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    });
+    res.status(201).json(newUser);
   } catch (error) {
-    console.error('Error registering user:', error);
-    res.status(500).json({ error: 'Kullanıcı kaydı sırasında bir hata oluştu' });
+    console.error('Error creating user:', error);
+    res.status(500).json({ error: 'Kullanıcı oluşturulurken bir hata oluştu' });
   }
 };
 
@@ -51,45 +34,35 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
   try {
     // Kullanıcıyı bul
-    const user = await User.findOne({ where: { username } });
-    if (username === 'admin' && password === 'admin') {
-      res.json({ message: 'Giriş başarılı', user });
-      return;
-      
-    }
-    // Kullanıcıyı kontrol et
+    const user = await prisma.user.findUnique({
+      where: {
+        username: username
+      }
+    });
+
+    // Kullanıcı yoksa hata dön
     if (!user) {
-      res.status(401).json({ error: 'Kullanıcı adı veya parola hatalı' });
+      res.status(404).json({ message: 'Kullanıcı bulunamadı' });
       return;
     }
 
-    // Parolayı kontrol et
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!isPasswordCorrect) {
-      res.status(401).json({ error: 'Kullanıcı adı veya parola hatalı' });
+    // Şifre eşleşmiyorsa hata dön
+    if (!await bcrypt.compare(password, user.password)) {
+      res.status(401).json({ message: 'Hatalı şifre' });
       return;
     }
 
-    res.json({ message: 'Giriş başarılı', user });
+    // Kullanıcı adı ve şifre doğruysa giriş başarılı dön
+    res.status(200).json({ message: 'Giriş başarılı' });
   } catch (error) {
-    console.error('Error logging in user:', error);
-    res.status(500).json({ error: 'Giriş sırasında bir hata oluştu' });
+    console.error('Error logging in:', error);
+    res.status(500).json({ error: 'Giriş yapılırken bir hata oluştu' });
   }
+
 };
 
 // Çıkış işlemi (bu örnekte basit bir çıkış işlemidir)
 export const logout = async (req: Request, res: Response): Promise<void> => {
-  res.json({ message: 'Çıkış başarılı' });
-};
-
-export const createUser = async (req: Request, res: Response) => {
-  try {
-    const { username, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await User.create({ username, password: hashedPassword });
-    res.status(201).json(newUser);
-  } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ error: 'Failed to create user' });
-  }
+  // logout işlemi
+  res.status(200).json({ message: 'Çıkış yapıldı' });
 };

@@ -2,11 +2,10 @@ import { Router } from 'express';
 import { getBookings, getBookingById, createBooking, updateBooking, deleteBooking } from '../controllers/bookingController';
 import { getRoomsByHotel, createRoom } from '../controllers/roomController';
 import { fetchRoomsForHotel } from '../controllers/checkAvailabilityController';
-import { createUser, login, logout, register } from '../controllers/userController';
+import {  login, logout, register } from '../controllers/userController';
 import { getAllHotels, getHotelById, createHotel, updateHotel, deleteHotel } from '../controllers/hotelController';
 
 const router = Router();
-
 
 router.get('/hotels', getAllHotels);
 router.get('/hotels/:id', getHotelById);
@@ -58,6 +57,5 @@ router.post('/login', login);
 
 router.post('/logout', logout);
 
-router.post('/createUser', createUser);
 
 export default router;

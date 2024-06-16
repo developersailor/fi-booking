@@ -34,6 +34,5 @@ router.get('/check-availability/:hotelId', checkAvailabilityController_1.fetchRo
 router.post('/register', userController_1.register);
 router.post('/login', userController_1.login);
 router.post('/logout', userController_1.logout);
-router.post('/createUser', userController_1.createUser);
 exports.default = router;
 //# sourceMappingURL=index.js.map
