@@ -7,7 +7,6 @@ import path from 'path'; // Import the 'path' module
 
 import { setupSwagger } from './swagger'; // Swagger konfigürasyonunu içe aktarın
 import routes from './routes/index'; // Route'ları içe aktarın
-import exp from 'constants';
 
 const app = express();
 dotenv.config();
