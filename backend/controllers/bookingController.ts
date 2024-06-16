@@ -1,16 +1,30 @@
 import { Request, Response } from 'express';
-import models from '../models';
+import { Sequelize } from 'sequelize';
+import Booking from '../models/booking';
 
-const { Booking } = models;
+// Initialize Sequelize instance
+const sequelize = new Sequelize(
+  process.env.DB_NAME as string,
+  process.env.DB_USERNAME as string,
+  process.env.DB_PASSWORD as string,
+  {
+    dialect: 'postgres',
+    host: 'localhost',
+    port: 5432,
+  }
+);
+
 
 export const getBookings = async (req: Request, res: Response) => {
+  const { userId } = req.query;
   try {
-    const bookings = await Booking.findAll();
+    const bookings = await Booking.findAll( { where: { userId } });
     res.status(200).json(bookings);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch bookings' });
   }
 };
+
 
 export const getBookingById = async (req: Request, res: Response) => {
   try {
@@ -25,6 +39,7 @@ export const getBookingById = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch booking' });
   }
 };
+
 
 
 export const createBooking = async (req: Request, res: Response) => {

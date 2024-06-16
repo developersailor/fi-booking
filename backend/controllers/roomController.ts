@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
-import models from '../models';
-
-const { Room } = models;
+import Room from '../models/room';
 
 export const createRoom = async (req: Request, res: Response) => {
   try {

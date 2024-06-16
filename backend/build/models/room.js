@@ -11,6 +11,11 @@ exports.default = (sequelize, types) => {
         }
     }
     Room.init({
+        id: {
+            type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+            autoIncrement: true,
+            primaryKey: true,
+        },
         name: {
             type: sequelize_1.DataTypes.STRING,
             allowNull: false,

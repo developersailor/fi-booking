@@ -4,19 +4,36 @@ const sequelize_1 = require("sequelize");
 exports.default = (sequelize, types) => {
     class Booking extends sequelize_1.Model {
         static associate(models) {
+            Booking.belongsTo(models.User, {
+                foreignKey: 'userId',
+            });
             Booking.belongsTo(models.Hotel, {
                 foreignKey: 'hotelId',
-                as: 'hotel'
             });
             Booking.belongsTo(models.Room, {
                 foreignKey: 'roomId',
-                as: 'room'
-            });
+            }), {
+                sequelize,
+                tableName: 'booking',
+            };
         }
     }
     Booking.init({
+        id: {
+            type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+            autoIncrement: true,
+            primaryKey: true,
+        },
         userId: {
-            type: sequelize_1.DataTypes.INTEGER,
+            type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+            allowNull: false,
+        },
+        hotelId: {
+            type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
+            allowNull: false,
+        },
+        roomId: {
+            type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
             allowNull: false,
         },
         checkInDate: {
@@ -27,17 +44,9 @@ exports.default = (sequelize, types) => {
             type: sequelize_1.DataTypes.DATE,
             allowNull: false,
         },
-        hotelId: {
-            type: sequelize_1.DataTypes.INTEGER,
-            allowNull: false,
-        },
-        roomId: {
-            type: sequelize_1.DataTypes.INTEGER,
-            allowNull: false,
-        },
     }, {
         sequelize,
-        modelName: 'Booking',
+        tableName: 'bookings',
     });
     return Booking;
 };

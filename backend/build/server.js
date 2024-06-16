@@ -17,7 +17,17 @@ const index_2 = __importDefault(require("./routes/index")); // Route'ları içe 
 const app = (0, express_1.default)();
 exports.app = app;
 dotenv_1.default.config();
-app.use(express_1.default.json());
+// Body parser middleware
+app.use(body_parser_1.default.json());
+app.use(body_parser_1.default.urlencoded({ extended: true }));
+// CORS ayarları
+const corsOptions = {
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Access-Control-Allow-Methods'],
+    credentials: true,
+};
+app.use((0, cors_1.default)(corsOptions));
 // Route'ları ekleyin
 app.use(index_2.default);
 // Swagger'ı kurun
@@ -25,14 +35,6 @@ app.use(index_2.default);
 const pathToSwaggerUi = path_1.default.join(__dirname, 'swagger-ui'); // Define the 'pathToSwaggerUi' variable
 app.use(express_1.default.static(pathToSwaggerUi));
 const PORT = parseInt(process.env.PORT || '3000', 10);
-const corsOptions = {
-    origin: 'http://localhost:5173',
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type'],
-};
-app.use(body_parser_1.default.json());
-app.use((0, cors_1.default)(corsOptions));
-app.use(index_2.default);
 // Nodemailer setup
 const transporter = nodemailer_1.default.createTransport({
     service: 'Gmail',
@@ -62,6 +64,10 @@ app.post('/contact', (req, res) => {
     });
 });
 index_1.sequelize.sync().then(() => {
-    app.listen(PORT);
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}).catch((err) => {
+    console.error('Unable to connect to the database:', err);
 });
 //# sourceMappingURL=server.js.map
