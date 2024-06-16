@@ -16,17 +16,28 @@ const initialState: AuthState = {
   status: 'loading'
 };
 
+interface LoginData {
+  username: string;
+  password: string;
+  hotelId: string;
+}
+
 export const login = createAsyncThunk(
   'auth/login',
-  async (user: { username: string; password: string; hotelId: string }) => {
-    const response = await fetch('http://localhost:3000/login', {
+  async ({ username, password, hotelId }: LoginData) => {
+    // Implement logic to send login request to your Express backend API
+    // and return the user data or a success message upon successful login
+    const response = await fetch('/api/auth/login', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(user),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password, hotelId }),
     });
-    return response.json();
+    const data = await response.json();
+    if (response.ok) {
+      return data; // Return user data or success message
+    } else {
+      throw new Error('Login failed'); // Throw error on failed login
+    }
   }
 );
 

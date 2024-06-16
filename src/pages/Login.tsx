@@ -14,16 +14,14 @@ const Login: React.FC = () => {
   const authStatus = useSelector((state: RootState) => state.auth.status);
   const authError = useSelector((state: RootState) => state.auth.error);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    dispatch(login({ username, password, hotelId }))
-      .unwrap()
-      .then(() => {
-        navigate('/dashboard'); // Navigate to dashboard after successful login
-      })
-      .catch((error) => {
-        console.error('Failed to login:', error);
-      });
+    try {
+      await dispatch(login({ username, password, hotelId }));
+      navigate('/dashboard'); // Navigate to dashboard after successful login
+    } catch (error) {
+      console.error('Failed to login:', error);
+    }
   };
 
   return (
