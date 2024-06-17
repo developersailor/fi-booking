@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'; // Import BrowserRouter and Route components
 import Home from './pages/Home';
-import CheckAvailability from './pages/CheckAvailability';// Import Admin component
 import Headers from './components/Header'; // Import Headers component
 import Contact from './pages/Contact';
 import Login from './pages/Login';
@@ -18,7 +17,6 @@ const App: React.FC = () => {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/admin" element={<AdminPanel />} />
-                <Route path="/check-availability" element={<CheckAvailability />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />

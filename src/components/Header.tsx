@@ -25,9 +25,6 @@ const Header: React.FC = () => {
           <Link to="/contact" className="mr-4">
             Contact
           </Link>
-          <Link to="/check-availability" className="mr-4">
-            Check Availability
-          </Link>
           {user ? (
             <>
               <span className="mr-4">{user.username}</span>
