@@ -1,0 +1,51 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "version": "1.0.0",
+      "title": "Hotel Booking API",
+      "description": "API for booking hotels"
+    },
+    "host": "localhost:3000",
+    "basePath": "/",
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/hotels": {
+        "get": {
+          "summary": "Get all hotels",
+          "responses": {
+            "200": {
+              "description": "A list of hotels"
+            }
+          }
+        },
+        "post": {
+          "summary": "Create a new hotel",
+          "responses": {
+            "201": {
+              "description": "The created hotel"
+            }
+          }
+        }
+      },
+      "/hotels/{id}": {
+        "get": {
+          "summary": "Get a hotel by ID",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "The requested hotel"
+            }
+          }
+        }
+      }
+    }
+  }

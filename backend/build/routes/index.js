@@ -1,4 +1,7 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const bookingController_1 = require("../controllers/bookingController");
@@ -6,6 +9,8 @@ const roomController_1 = require("../controllers/roomController");
 const checkAvailabilityController_1 = require("../controllers/checkAvailabilityController");
 const userController_1 = require("../controllers/userController");
 const hotelController_1 = require("../controllers/hotelController");
+const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
+const swaggerDocument = require('./swagger.json');
 const router = (0, express_1.Router)();
 router.get('/hotels', hotelController_1.getAllHotels);
 router.get('/hotels/:id', hotelController_1.getHotelById);
@@ -35,5 +40,7 @@ router.post('/check-availability', checkAvailabilityController_1.checkAvailabili
 router.post('/register', userController_1.register);
 router.post('/login', userController_1.login);
 router.post('/logout', userController_1.logout);
+router.use('/api-docs', swagger_ui_express_1.default.serve);
+router.get('/api-docs', swagger_ui_express_1.default.setup(swaggerDocument));
 exports.default = router;
 //# sourceMappingURL=index.js.map

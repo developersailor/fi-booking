@@ -4,7 +4,8 @@ import { getRoomsByHotel, createRoom } from '../controllers/roomController';
 import { checkAvailability, fetchRoomsForHotel } from '../controllers/checkAvailabilityController';
 import {  login, logout, register } from '../controllers/userController';
 import { getAllHotels, getHotelById, createHotel, updateHotel, deleteHotel } from '../controllers/hotelController';
-
+import  swaggerUi from 'swagger-ui-express';
+const swaggerDocument: JSON = require('./swagger.json');
 
 const router = Router();
 
@@ -60,4 +61,6 @@ router.post('/register', register);
 router.post('/login', login);
 
 router.post('/logout', logout);
+router.use('/api-docs', swaggerUi.serve);
+router.get('/api-docs', swaggerUi.setup(swaggerDocument));
 export default router;

@@ -8,8 +8,6 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const winston_1 = __importDefault(require("winston"));
-const path_1 = __importDefault(require("path"));
-const swagger_1 = require("./swagger"); // Swagger konfigürasyonunu içe aktarın
 const index_1 = __importDefault(require("./routes/index")); // Route'ları içe aktarın
 const app = (0, express_1.default)();
 dotenv_1.default.config();
@@ -26,10 +24,6 @@ const corsOptions = {
 app.use((0, cors_1.default)(corsOptions));
 // Route'ları ekleyin
 app.use(index_1.default);
-// Swagger'ı kurun
-(0, swagger_1.setupSwagger)(app);
-const pathToSwaggerUi = path_1.default.join(__dirname, 'swagger-ui'); // Define the 'pathToSwaggerUi' variable
-app.use(express_1.default.static(pathToSwaggerUi));
 const PORT = parseInt(process.env.PORT || '3000', 10);
 app.listen(PORT, () => {
     const logger = winston_1.default.createLogger({
@@ -50,7 +44,7 @@ app.listen(PORT, () => {
     }
     if (process.env.NODE_ENV === 'development') {
         console.log(`Server is running on http://localhost:${PORT}`);
-        console.log(`Swagger UI is running on http://localhost:${PORT}/swagger`);
+        console.log(`Swagger UI is running on http://localhost:${PORT}/api-docs`);
     }
     else if (process.env.NODE_ENV === 'production') {
         console.log("production mode");

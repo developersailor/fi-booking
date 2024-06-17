@@ -5,7 +5,6 @@ import dotenv from 'dotenv';
 import winston from 'winston'; 
 import path from 'path'; 
 
-import { setupSwagger } from './swagger'; // Swagger konfigürasyonunu içe aktarın
 import routes from './routes/index'; // Route'ları içe aktarın
 
 const app = express();
@@ -27,11 +26,6 @@ app.use(cors(corsOptions));
 // Route'ları ekleyin
 app.use(routes);
 
-// Swagger'ı kurun
-setupSwagger(app);
-
-const pathToSwaggerUi = path.join(__dirname, 'swagger-ui'); // Define the 'pathToSwaggerUi' variable
-app.use(express.static(pathToSwaggerUi));
 
 const PORT: number = parseInt(process.env.PORT || '3000', 10);
 
@@ -57,7 +51,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
   if(process.env.NODE_ENV === 'development'){
     console.log(`Server is running on http://localhost:${PORT}`);
-    console.log(`Swagger UI is running on http://localhost:${PORT}/swagger`);
+    console.log(`Swagger UI is running on http://localhost:${PORT}/api-docs`);
   }
   else if (process.env.NODE_ENV === 'production'){
     console.log("production mode")
