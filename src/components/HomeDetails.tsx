@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
-import { HotelData } from '../types/HotelData';
+import { HotelData } from '../types/hotel';
 import StarRating from './StarRating';
 import CheckAvailability from './CheckAvailabity';
+import Modal from './Modal';
+import Review from './Review';
 interface HomeDetailsProps {
   hotel: HotelData;
 }
 
 const HomeDetails: React.FC<HomeDetailsProps> = ({ hotel }) => {
   const [currentRating, setCurrentRating] = useState<number>(hotel.rating);
-
+  const [showReviews, setShowReviews] = useState<boolean>(false);
   const handleRatingChange = (rating: number) => {
     setCurrentRating(rating);
-    // Burada, güncellenen rating değerini API'ye göndermek için bir işlem ekleyebilirsiniz
+    
+  };
+  const handleCloseReviews = () => {
+    setShowReviews(false);
   };
 
   return (
@@ -32,6 +37,23 @@ const HomeDetails: React.FC<HomeDetailsProps> = ({ hotel }) => {
         </div>
         <CheckAvailability hotel={hotel} />
       </div>
+      <button className={
+        "w-full py-2 bg-gray-800 text-white font-semibold text-sm uppercase rounded-b-lg"
+      } onClick={
+        () => setShowReviews(true)
+      } >
+      <Modal onClose={handleCloseReviews} isOpen={showReviews} children={
+          <Review hotelId={hotel.id} reviews={[
+            { id: 1, author: 'John Doe', content: 'Great place to stay!', rating: 5 },
+            { id: 2, author: 'Jane Doe', content: 'Loved it!', rating: 4 },
+            { id: 3, author: 'Alice', content: 'Not bad', rating: 3 },
+            
+          ]} />
+        }>
+        </Modal>
+      </button>
+
+      
     </div>
   );
 };

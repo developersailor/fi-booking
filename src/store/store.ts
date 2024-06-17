@@ -3,6 +3,7 @@ import authReducer from '../slice/authSlice';
 import hotelReducer from '../slice/hotelSlice';
 import adminReducer from '../slice/adminSlice';
 import availabilityReducer from '../slice/availabilitySlice';
+import reviewSlice from '../slice/reviewSlice';
 
 // Configure the store with all the reducers
 const store = configureStore({
@@ -11,6 +12,7 @@ const store = configureStore({
     hotel: hotelReducer,
     admin: adminReducer,
     availability: availabilityReducer.reducer,
+    reviews: reviewSlice,
   },
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware({

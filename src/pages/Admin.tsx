@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchHotels, addHotel, updateHotel, deleteHotel } from '../slice/adminSlice';
 import { RootState, AppDispatch } from '../store/store';
-import { HotelData } from '../types/HotelData';
+import { HotelData } from '../types/hotel';
 
 const AdminPanel: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {  setHotels } from '../slice/hotelSlice'; // fetchHotels ekleyelim
 import HomeDetails from '../components/HomeDetails';
 import { RootState } from '../store/store';
-import { HotelData } from '../types/HotelData';
+import { HotelData } from '../types/hotel';
 import axios from 'axios';
 
 const Home: React.FC = () => {

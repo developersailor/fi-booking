@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HotelData } from '../types/HotelData';
+import { HotelData } from '../types/hotel';
 import { checkAvailability } from '../slice/availabilitySlice';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
-import { HotelData } from "../types/HotelData";
+import { HotelData } from "../types/hotel";
 
 interface HotelState {
   hotel: HotelData[];

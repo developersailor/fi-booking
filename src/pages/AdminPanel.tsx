@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { RootState, AppDispatch } from '../store/store';
-import { HotelData } from '../types/HotelData';
+import { HotelData } from '../types/hotel';
 import Modal from '../components/Modal';
 import { fetchHotels } from '../slice/hotelSlice';
 import { addHotel, deleteHotel, updateHotel } from '../slice/adminSlice';

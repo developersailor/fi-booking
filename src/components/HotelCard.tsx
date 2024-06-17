@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { setHotel } from '../slice/hotelSlice';
-
+import { useDispatch,useSelector } from 'react-redux';
+import { setHotels } from '../slice/hotelSlice';
+import { RootState } from '../store/store';
+import { HotelData } from '../types/hotel';
 interface Image {
   url: string;
 }
@@ -21,10 +22,10 @@ interface HotelCardProps {
 
 const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
   const dispatch = useDispatch();
-
+  const hoteldata: HotelData[] = useSelector((state: RootState) => state.hotel.hotel);
   useEffect(() => {
-    dispatch(setHotel(hotel));
-  }, [hotel, dispatch]);
+    dispatch(setHotels(hoteldata));
+  }, [ hoteldata, dispatch]);
 
   return (
     <div className="p-4 border rounded-lg">
