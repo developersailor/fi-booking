@@ -10,7 +10,7 @@ const initialState: ReviewState = {
 export const fetchReviews = createAsyncThunk<Review[], number>(
   "reviews/fetchReviews",
   async (hotelId:number) => {
-    const response = await axios.get<Review[]>(`http://localhost:3000/hotels/${hotelId}/reviews`);
+    const response = await axios.get<Review[]>(`http://localhost:3000/hotel/${hotelId}/reviews`);
     return response.data;
   }
 );
@@ -18,7 +18,7 @@ export const fetchReviews = createAsyncThunk<Review[], number>(
 export const addReview = createAsyncThunk<Review, { hotelId: number, review: Review }>(
     "reviews/addReview",
     async ({ hotelId, review }) => {
-        const response = await axios.post<Review>(`http://localhost:3000/hotels/${hotelId}/reviews`, review, {
+        const response = await axios.post<Review>(`http://localhost:3000/hotel/${hotelId}/reviews`, review, {
         headers: {
             'Content-Type': 'application/json',
         },

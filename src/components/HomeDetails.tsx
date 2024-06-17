@@ -42,17 +42,16 @@ const HomeDetails: React.FC<HomeDetailsProps> = ({ hotel }) => {
       } onClick={
         () => setShowReviews(true)
       } >
+        Read Reviews
+      </button>
       <Modal onClose={handleCloseReviews} isOpen={showReviews} children={
           <Review hotelId={hotel.id} reviews={[
             { id: 1, author: 'John Doe', content: 'Great place to stay!', rating: 5 },
             { id: 2, author: 'Jane Doe', content: 'Loved it!', rating: 4 },
-            { id: 3, author: 'Alice', content: 'Not bad', rating: 3 },
-            
-          ]} />
+            { id: 3, author: 'Alice', content: 'Not bad', rating: 3 }, 
+          ]}/>
         }>
         </Modal>
-      </button>
-
       
     </div>
   );
