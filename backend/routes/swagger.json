@@ -22,6 +22,16 @@
         },
         "post": {
           "summary": "Create a new hotel",
+          "parameters": [
+            {
+              "name": "hotel",
+              "in": "body",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/Hotel"
+              }
+            }
+          ],
           "responses": {
             "201": {
               "description": "The created hotel"
