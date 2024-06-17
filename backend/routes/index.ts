@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { getBookings, getBookingById, createBooking, updateBooking, deleteBooking } from '../controllers/bookingController';
 import { getRoomsByHotel, createRoom } from '../controllers/roomController';
-import { fetchRoomsForHotel } from '../controllers/checkAvailabilityController';
+import { checkAvailability, fetchRoomsForHotel } from '../controllers/checkAvailabilityController';
 import {  login, logout, register } from '../controllers/userController';
 import { getAllHotels, getHotelById, createHotel, updateHotel, deleteHotel } from '../controllers/hotelController';
 
@@ -50,6 +50,9 @@ router.get('/hotels/:id/rooms', getRoomsByHotel);
 router.post('/hotels/:id/rooms', createRoom);
 
 router.get('/check-availability/:hotelId', fetchRoomsForHotel);
+ 
+router.post('/check-availability', checkAvailability);
+
 
 router.post('/register', register);
 

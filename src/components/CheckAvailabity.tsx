@@ -17,7 +17,7 @@ const CheckAvailability: React.FC<CheckAvailabilityProps> = ({ hotel }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post('/check-availability', {
+      const response = await axios.post('http://localhost:3000/check-availability', {
         hotelId: hotel.id,
         checkInDate,
         checkOutDate,
