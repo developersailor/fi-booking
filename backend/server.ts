@@ -2,8 +2,8 @@ import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
-
-import path from 'path'; // Import the 'path' module
+import winston from 'winston'; 
+import path from 'path'; 
 
 import { setupSwagger } from './swagger'; // Swagger konfigürasyonunu içe aktarın
 import routes from './routes/index'; // Route'ları içe aktarın
@@ -37,7 +37,34 @@ const PORT: number = parseInt(process.env.PORT || '3000', 10);
 
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' }),
+    new winston.transports.File({ filename: 'info.log', level: 'info' }),
+    // prisma client logları için
+    new winston.transports.File({ filename: 'prisma.log', level: 'info' }),
+  ],
+});
+
+if (process.env.NODE_ENV !== 'production') {
+  logger.add(new winston.transports.Console({
+    format: winston.format.simple(),
+  }));
+}
+  if(process.env.NODE_ENV === 'development'){
+    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Swagger UI is running on http://localhost:${PORT}/swagger`);
+  }
+  else if (process.env.NODE_ENV === 'production'){
+    console.log("production mode")
+  }
+  else{
+    console.log("unknown mode")
+  }
 });
 
 export default app;

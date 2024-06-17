@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { HotelData } from '../types/HotelData';
+import { checkAvailability } from '../slice/availabilitySlice';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
 
 interface CheckAvailabilityProps {
   hotel: HotelData;
 }
 
 const CheckAvailability: React.FC<CheckAvailabilityProps> = ({ hotel }) => {
+  const actionResult = useSelector((state: RootState ) => state.availability);
+
   const [checkInDate, setCheckInDate] = useState<string>('');
   const [checkOutDate, setCheckOutDate] = useState<string>('');
-  const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,12 +20,15 @@ const CheckAvailability: React.FC<CheckAvailabilityProps> = ({ hotel }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post('http://localhost:3000/check-availability', {
-        hotelId: hotel.id,
-        checkInDate,
-        checkOutDate,
-      });
-      setIsAvailable(response.data.isAvailable);
+      if (!checkInDate || !checkOutDate) {
+        setError('Please select check-in and check-out dates');
+        return;
+      }
+      // Dispatch the checkAvailability action
+      await checkAvailability({ hotelId: hotel.id.toString(), checkInDate, checkOutDate });
+      
+      // Handle the result as needed
+      console.log('Check availability action result:', actionResult);
     } catch (err) {
       setError('Error checking availability');
     } finally {
@@ -55,11 +61,6 @@ const CheckAvailability: React.FC<CheckAvailabilityProps> = ({ hotel }) => {
       </div>
       {loading && <p>Loading...</p>}
       {error && <p className="text-red-500">{error}</p>}
-      {isAvailable !== null && (
-        <p className={`text-lg font-bold ${isAvailable ? 'text-green-500' : 'text-red-500'}`}>
-          {isAvailable ? 'Available' : 'Not Available'}
-        </p>
-      )}
     </div>
   );
 };

@@ -7,7 +7,8 @@ const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const path_1 = __importDefault(require("path")); // Import the 'path' module
+const winston_1 = __importDefault(require("winston"));
+const path_1 = __importDefault(require("path"));
 const swagger_1 = require("./swagger"); // Swagger konfigürasyonunu içe aktarın
 const index_1 = __importDefault(require("./routes/index")); // Route'ları içe aktarın
 const app = (0, express_1.default)();
@@ -31,7 +32,32 @@ const pathToSwaggerUi = path_1.default.join(__dirname, 'swagger-ui'); // Define 
 app.use(express_1.default.static(pathToSwaggerUi));
 const PORT = parseInt(process.env.PORT || '3000', 10);
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    const logger = winston_1.default.createLogger({
+        level: 'info',
+        format: winston_1.default.format.json(),
+        transports: [
+            new winston_1.default.transports.File({ filename: 'error.log', level: 'error' }),
+            new winston_1.default.transports.File({ filename: 'combined.log' }),
+            new winston_1.default.transports.File({ filename: 'info.log', level: 'info' }),
+            // prisma client logları için
+            new winston_1.default.transports.File({ filename: 'prisma.log', level: 'info' }),
+        ],
+    });
+    if (process.env.NODE_ENV !== 'production') {
+        logger.add(new winston_1.default.transports.Console({
+            format: winston_1.default.format.simple(),
+        }));
+    }
+    if (process.env.NODE_ENV === 'development') {
+        console.log(`Server is running on http://localhost:${PORT}`);
+        console.log(`Swagger UI is running on http://localhost:${PORT}/swagger`);
+    }
+    else if (process.env.NODE_ENV === 'production') {
+        console.log("production mode");
+    }
+    else {
+        console.log("unknown mode");
+    }
 });
 exports.default = app;
 //# sourceMappingURL=server.js.map

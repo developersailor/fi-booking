@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchHotels, addHotel, updateHotel, deleteHotel } from '../slice/adminSlice';
+
 import { RootState, AppDispatch } from '../store/store';
 import { HotelData } from '../types/HotelData';
 import Modal from '../components/Modal';
+import { fetchHotels } from '../slice/hotelSlice';
+import { addHotel, deleteHotel, updateHotel } from '../slice/adminSlice';
 
 const AdminPanel: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { hotels, loading, error } = useSelector((state: RootState) => state.admin);
+  const {  
+    hotels
+    } = useSelector((state: RootState) => state.admin);
   const [newHotel, setNewHotel] = useState<HotelData>({
     id: 0,
     name: '',
@@ -69,9 +73,17 @@ const AdminPanel: React.FC = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Admin Panel</h1>
-
-      {loading && <p>Loading...</p>}
-      {error && <p>Error: {error.message}</p>}
+        {
+        hotels.map((hotel) => (
+            <div key={hotel.id} className="border p-4">
+                <h3 className="font-bold">{hotel.name}</h3>
+                <p>{hotel.location}</p>
+                <p>{hotel.description}</p>
+                <button onClick={() => openEditModal(hotel)} className="bg-green-500 text-white p-2 mr-2">Update</button>
+                <button onClick={() => handleDeleteHotel(hotel.id)} className="bg-red-500 text-white p-2">Delete</button>
+            </div>
+            ))
+        }
 
       <div className="mb-4">
         <h2 className="text-xl font-bold mb-2">Add New Hotel</h2>

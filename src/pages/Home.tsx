@@ -4,6 +4,7 @@ import {  setHotels } from '../slice/hotelSlice'; // fetchHotels ekleyelim
 import HomeDetails from '../components/HomeDetails';
 import { RootState } from '../store/store';
 import { HotelData } from '../types/HotelData';
+import axios from 'axios';
 
 const Home: React.FC = () => {
   const dispatch = useDispatch();
@@ -12,8 +13,8 @@ const Home: React.FC = () => {
   useEffect(() => {
     const fetchHotels = async () => {
       try {
-        const response = await fetch('http://localhost:3000/hotels');
-        const data = await response.json();
+        const response = await axios.get('http://localhost:3000/hotels');
+        const data = await response.data;
         dispatch(setHotels(data));
       } catch (error) {
         console.error('Failed to fetch hotels:', error);

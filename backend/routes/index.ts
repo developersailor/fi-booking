@@ -5,6 +5,7 @@ import { checkAvailability, fetchRoomsForHotel } from '../controllers/checkAvail
 import {  login, logout, register } from '../controllers/userController';
 import { getAllHotels, getHotelById, createHotel, updateHotel, deleteHotel } from '../controllers/hotelController';
 
+
 const router = Router();
 
 router.get('/hotels', getAllHotels);
@@ -59,6 +60,4 @@ router.post('/register', register);
 router.post('/login', login);
 
 router.post('/logout', logout);
-
-
 export default router;

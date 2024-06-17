@@ -31,6 +31,7 @@ router.get('/hotels/:id', hotelController_1.getHotelById);
 router.get('/hotels/:id/rooms', roomController_1.getRoomsByHotel);
 router.post('/hotels/:id/rooms', roomController_1.createRoom);
 router.get('/check-availability/:hotelId', checkAvailabilityController_1.fetchRoomsForHotel);
+router.post('/check-availability', checkAvailabilityController_1.checkAvailability);
 router.post('/register', userController_1.register);
 router.post('/login', userController_1.login);
 router.post('/logout', userController_1.logout);
