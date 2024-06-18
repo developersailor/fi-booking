@@ -1,13 +1,18 @@
-export interface Review {
+
+export interface ReviewData{
+  id: number;
+  author: string| null;
+  content: string | null;
+  rating: number | null;
+  loading: boolean;
+  error: string | null;
+  pricePerNight: number;
+  guests: number;
+  bedrooms: number;
+  bathrooms: number; 
+  images: string[];
+}
+
+export interface ReviewPayload {
     id: number;
-    author: string;
-    content: string;
-    rating: number;
-  }
-  
-export  interface ReviewState {
-    reviews: Review[];
-    loading: boolean;
-    error: string | null;
-  }
-  
+}

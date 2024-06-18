@@ -6,7 +6,7 @@ import { HotelData } from '../types/hotel';
 
 const AdminPanel: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { hotels, loading, error } = useSelector((state: RootState) => state.admin);
+  const { hotels, loading, error } = useSelector((state: RootState) => state.adminStore);
   const [newHotel, setNewHotel] = useState<HotelData>({
     id: 0,
     name: '',

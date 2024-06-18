@@ -63,4 +63,4 @@ export const checkAvailability = createAsyncThunk(
 });
 export const { reducer } = availabilitySlice;
 
-export default availabilitySlice;
+export default availabilitySlice.reducer;

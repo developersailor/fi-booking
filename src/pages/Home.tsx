@@ -8,7 +8,7 @@ import axios from 'axios';
 
 const Home: React.FC = () => {
   const dispatch = useDispatch();
-  const hotels = useSelector((state: RootState) => state.hotel.hotel); // Doğru yolu kullanarak 'hotel' dizisine erişelim
+  const hotels = useSelector((state: RootState) => state.hotelStore.hotel); // Doğru yolu kullanarak 'hotel' dizisine erişelim
 
   useEffect(() => {
     const fetchHotels = async () => {
@@ -26,7 +26,9 @@ const Home: React.FC = () => {
   return hotels && hotels.length > 0 ? ( // hotels.hotel yerine hotels kullanıyoruz
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {hotels.map((hotel: HotelData) => (
-        <HomeDetails key={hotel.id} hotel={hotel} />
+        <HomeDetails key={hotel.id} hotel={hotel} hotelId={
+          String(hotel.id)
+        } />
       ))}
     </div>
   ) : (

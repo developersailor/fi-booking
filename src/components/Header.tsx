@@ -5,7 +5,7 @@ import { RootState } from '../store/store';
 import { logout } from '../slice/authSlice';
 
 const Header: React.FC = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: RootState) => state.authStore);
   const dispatch = useDispatch();
 
   const handleLogout = () => {

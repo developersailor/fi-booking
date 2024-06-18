@@ -11,7 +11,7 @@ const AdminPanel: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const {  
     hotels
-    } = useSelector((state: RootState) => state.admin);
+    } = useSelector((state: RootState) => state.adminStore);
   const [newHotel, setNewHotel] = useState<HotelData>({
     id: 0,
     name: '',

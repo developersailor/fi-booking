@@ -6,6 +6,7 @@ interface AdminState {
   hotels: HotelData[];
   loading: boolean;
   error: Error | null;
+
 }
 
 const initialState: AdminState = {

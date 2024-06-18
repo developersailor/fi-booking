@@ -4,19 +4,22 @@ import StarRating from './StarRating';
 import CheckAvailability from './CheckAvailabity';
 import Modal from './Modal';
 import Review from './Review';
+import CreateReview from './CreateReview';
 interface HomeDetailsProps {
   hotel: HotelData;
+  hotelId: string;
 }
 
 const HomeDetails: React.FC<HomeDetailsProps> = ({ hotel }) => {
   const [currentRating, setCurrentRating] = useState<number>(hotel.rating);
   const [showReviews, setShowReviews] = useState<boolean>(false);
+  const [showCreateReview, setShowCreateReview] = useState<boolean>(false);
   const handleRatingChange = (rating: number) => {
     setCurrentRating(rating);
-    
   };
   const handleCloseReviews = () => {
     setShowReviews(false);
+    setShowCreateReview(false);
   };
 
   return (
@@ -44,15 +47,27 @@ const HomeDetails: React.FC<HomeDetailsProps> = ({ hotel }) => {
       } >
         Read Reviews
       </button>
+      <button className={
+        "w-full py-2 bg-gray-800 text-white font-semibold text-sm uppercase rounded-b-lg"
+      } onClick={
+        () => setShowCreateReview(true)
+      }>
+        Create Review
+      </button>
       <Modal onClose={handleCloseReviews} isOpen={showReviews} children={
-          <Review hotelId={hotel.id} reviews={[
-            { id: 1, author: 'John Doe', content: 'Great place to stay!', rating: 5 },
-            { id: 2, author: 'Jane Doe', content: 'Loved it!', rating: 4 },
-            { id: 3, author: 'Alice', content: 'Not bad', rating: 3 }, 
-          ]}/>
+        <Review hotelId={
+          hotel.id
+        } />
         }>
         </Modal>
-      
+      <Modal onClose={handleCloseReviews} isOpen={showCreateReview} children={
+        <CreateReview hotelId={
+          hotel.id
+        } reviewId={
+          hotel.reviews
+        }  />
+        }>
+        </Modal>
     </div>
   );
 };

@@ -22,7 +22,7 @@ interface HotelCardProps {
 
 const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
   const dispatch = useDispatch();
-  const hoteldata: HotelData[] = useSelector((state: RootState) => state.hotel.hotel);
+  const hoteldata: HotelData[] = useSelector((state: RootState) => state.hotelStore.hotel);
   useEffect(() => {
     dispatch(setHotels(hoteldata));
   }, [ hoteldata, dispatch]);

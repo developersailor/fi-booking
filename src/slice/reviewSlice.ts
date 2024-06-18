@@ -1,57 +1,67 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, Draft} from "@reduxjs/toolkit";
+
 import axios from "axios";
-import { Review, ReviewState } from "../types/review";
-const initialState: ReviewState = {
-  reviews: [],
-  loading: false,
-  error: null,
-};
+import { ReviewData } from "../types/review";
 
-export const fetchReviews = createAsyncThunk<Review[], number>(
-  "reviews/fetchReviews",
-  async (hotelId:number) => {
-    const response = await axios.get<Review[]>(`http://localhost:3000/hotel/${hotelId}/reviews`);
-    return response.data;
+export interface ReviewState {
+    id: number;
+    loading: boolean;
+    error: string | null;
+    reviews: Draft<ReviewData>[];
   }
-);
-
-export const addReview = createAsyncThunk<Review, { hotelId: number, review: Review }>(
-    "reviews/addReview",
-    async ({ hotelId, review }) => {
-        const response = await axios.post<Review>(`http://localhost:3000/hotel/${hotelId}/reviews`, review, {
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        });
+const initialState: ReviewState = { 
+    id: 0,
+    loading: false,
+    error: null,
+    reviews: [],
+};
+export const addReview = createAsyncThunk<ReviewState, ReviewState>(
+    "review/addReview",
+    async (review) => {
+        const response = await axios.post<ReviewState>("http://localhost:3000/reviews", review);
         return response.data;
     });
 
-const reviewSlice = createSlice({
-  name: 'reviews',
-  initialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchReviews.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchReviews.fulfilled, (state, action: PayloadAction<Review[]>) => {
-        state.loading = false;
-        state.reviews = action.payload;
-      })
-      .addCase(fetchReviews.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Something went wrong';
-      }).addCase(addReview.fulfilled, (state, action: PayloadAction<Review>) => {
-        state.reviews.push(action.payload);
-      }).addCase(addReview.rejected, (state, action) => {
-        state.error = action.error.message || 'Something went wrong';
-      }).addCase(addReview.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      });
-  },
-});
 
+export const fetchReview = createAsyncThunk<ReviewState[],number>(
+    "review/fetchReview",
+    async (hotelId) => {
+        const response = await axios.get<ReviewState[]>(`http://localhost:3000/hotel/${hotelId}/review`);
+        return response.data;
+    });
+
+export const updateReview = createAsyncThunk<ReviewState, ReviewState>(
+    "review/updateReview",
+    async (review) => {
+        const response = await axios.put<ReviewState>(`http://localhost:3000/reviews/${review.id}`, review);
+        return response.data;
+    });
+
+export const deleteReview = createAsyncThunk<number, number>(
+    "review/deleteReview",
+    async (id) => {
+        await axios.delete(`http://localhost:3000/reviews/${id}`);
+        return id;
+    });
+
+const reviewSlice = createSlice({
+    name: "reviewData",
+    initialState,
+    reducers: {},
+    extraReducers: (builder) => {
+        //Review.tsx için reducer
+        builder.addCase(fetchReview.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+        })
+        .addCase(fetchReview.fulfilled, (state) => {
+            state.loading = false;
+            state.error = null;
+        })
+        .addCase(fetchReview.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message || null;
+        });
+    }
+});
 export default reviewSlice.reducer;
